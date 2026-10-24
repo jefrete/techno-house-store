@@ -1,485 +1,529 @@
-// Pre-entrega 3
+// PRODUCTOS - ARRAYS PARALELOS
+const codigos = [
+  "TH001",
+  "TH002",
+  "TH003",
+  "TH004",
+  "TH005",
+  "TH006",
+  "TH007",
+  "TH008",
+];
 
-// PRODUCTOS: TECNO ILUMINACIÓN
-let codigoTiraLed = "TH001";
-let productoTiraLed = "Tira LED";
-let precioTiraLed = 15000;
-let stockTiraLed = 5;
+const productos = [
+  "Tira LED RGB",
+  "Tira de neon LED",
+  "Guirnalda LED",
+  "Lampara LED RGB",
+  "Panel LED de techo",
+  "Lampara LED de escritorio",
+  "Luz LED con sensor de movimiento",
+  "Barra LED USB",
+];
 
-let codigoTiraNeon = "TH002";
-let productoTiraNeon = "Tira Neón LED";
-let precioTiraNeon = 20000;
-let stockTiraNeon = 5;
+const precios = [15000, 20000, 16000, 12000, 25000, 18000, 14000, 10000];
 
-let codigoGuirnaldaSolar = "TH003";
-let productoGuirnaldaSolar = "Guirnalda solar";
-let precioGuirnaldaSolar = 16000;
-let stockGuirnaldaSolar = 5;
+let stock = [5, 5, 5, 5, 5, 5, 5, 5];
 
-let codigoFloresSolar = "TH004";
-let productoFloresSolar = "Flores solares";
-let precioFloresSolar = 22000;
-let stockFloresSolar = 5;
+// PRODUCTOS DESTACADOS
+let destacados = ["TH001", "TH004", "TH008"];
 
-// PRODUCTOS: ENERGÍA Y CARGA
-let codigoCargador = "TH005";
-let productoCargador = "Cargador Fast Charge";
-let precioCargador = 15000;
-let stockCargador = 5;
+// CARRITO: guarda los índices de los productos
+let carrito = [];
 
-let codigoPowerBank = "TH006";
-let productoPowerBank = "Power Bank";
-let precioPowerBank = 25000;
-let stockPowerBank = 5;
+//FUNCIONES AUXILIARES
 
-let codigoCable = "TH007";
-let productoCable = "Cable USB-C";
-let precioCable = 8000;
-let stockCable = 5;
-
-// PRODUCTOS: BIENESTAR CORPORAL
-let codigoMasajeador = "TH008";
-let productoMasajeador = "Masajeador eléctrico";
-let precioMasajeador = 150000;
-let stockMasajeador = 5;
-
-let codigoPistolaMasaje = "TH009";
-let productoPistolaMasaje = "Pistola de masaje";
-let precioPistolaMasaje = 40000;
-let stockPistolaMasaje = 5;
-
-let codigoAlmohada = "TH010";
-let productoAlmohada = "Almohada cervical";
-let precioAlmohada = 50000;
-let stockAlmohada = 0;
-
-// PRODUCTOS: AIRE LIBRE
-let codigoKayakSimple = "TH011";
-let productoKayakSimple = "Kayak Simple";
-let precioKayakSimple = 650000;
-let stockKayakSimple = 5;
-
-let codigoKayakDoble = "TH012";
-let productoKayakDoble = "Kayak Doble";
-let precioKayakDoble = 1100000;
-let stockKayakDoble = 5;
-
-let codigoBicicletaAgua = "TH013";
-let productoBicicletaAgua = "Bicicleta de Agua";
-let precioBicicletaAgua = 3000000;
-let stockBicicletaAgua = 5;
-
-// VARIABLES DEL PRODUCTO SELECCIONADO
-let codigo = "";
-let producto = "";
-let precio = 0;
-let stock = 0;
+// BUSCAR POSICIÓN POR CÓDIGO
+const buscarIndice = (codigo) => codigos.indexOf(codigo.toUpperCase());
 
 
-// FUNCIONES
-// FUNCION DECLARADA - guarda los datos del producto elegido.
-function seleccionarProducto(
-    codigoProducto,
-    nombre,
-    valor,
-    cantidadDisponible
-) {
-    codigo = codigoProducto;
-    producto = nombre;
-    precio = valor;
-    stock = cantidadDisponible;
-}
+// LISTAR PRODUCTOS DESTACADOS
+const listarDestacados = function () {
+  let mensaje = "PRODUCTOS DESTACADOS:\n";
+  let posicion = 1;
 
-// FUNCION EXPRESADA: muestra los datos del producto seleccionado.
-const mostrarProducto = function(
-    codigoProducto,
-    nombre,
-    valor,
-    cantidadDisponible
-) {
-    alert(
-        "PRODUCTO SELECCIONADO\n\n" +
-        "Código: " + codigoProducto + "\n" +
-        "Producto: " + nombre + "\n" +
-        "Precio: $" + valor + "\n" +
-        "Stock disponible: " + cantidadDisponible
-    );
+  for (const codigo of destacados) {
+    let indice = buscarIndice(codigo);
 
-    console.log("Código:", codigoProducto);
-    console.log("Producto:", nombre);
-    console.log("Precio:", valor);
-    console.log("Stock:", cantidadDisponible);
+    mensaje = mensaje + posicion + ". " + productos[indice] + " - Código: " + codigo + "\n";
+
+    posicion++;
+  }
+
+  return mensaje;
 };
 
-// FUNCION DECLARADA: calcula el precio total de la compra.
-function calcularTotal(valor, cantidad) {
-    return valor * cantidad;
+
+// FINALIZAR COMPRA
+function finalizarCompra() {
+  if (carrito.length === 0) {
+    alert("No hay productos en el carrito.");
+    return;
+  }
+
+  let confirmar = confirm(mostrarCarrito() + "\n\n¿Desea confirmar la compra?");
+
+  if (confirmar) {
+    // limpiamos el carrito
+    carrito = [];
+
+    alert("Compra realizada correctamente. ¡Gracias!");
+
+  } else {
+
+    for (const indice of carrito) {
+      stock[indice]++;
+    }
+
+    carrito = [];
+    alert("Compra cancelada. Se devolvieron los productos al stock.");
+  }
 }
 
-// FUNCION FLECHA: verifica que la cantidad sea válida
-// y que exista stock suficiente.
 
-const verificarStock = (cantidad, cantidadDisponible) =>
-    cantidad > 0 && cantidad <= cantidadDisponible;
+// LISTAR CATÁLOGO DE PRODUCTOS
+function listarCatalogo() {
+  let mensaje = "CATÁLOGO DE PRODUCTOS:\n";
 
+  for (const codigo of codigos) {
+    let indice = buscarIndice(codigo);
 
-// FUNCION DECLARADA: devuelve el stock restante.
-function actualizarStock(cantidadDisponible, cantidad) {
-    return cantidadDisponible - cantidad;
+    let linea = codigo + " - " + productos[indice] + " - Precio: $" + precios[indice] + " - Stock: " + stock[indice];
+
+    mensaje = mensaje + linea + "\n";
+  }
+
+  return mensaje;
 }
 
-// INICIO DEL SIMULADOR
-let nombreCliente = prompt("Ingresá tu nombre:");
+// MOSTRAR CATALOGO EN CONSOLA
+function mostrarCatalogoEnConsola() {
+  console.log(listarCatalogo());
+}
 
-alert("TECHNO HOUSE STORE\n\nBienvenido/a " + nombreCliente);
 
-let seguirComprando = true;
+// COMPRAR PRODUCTO
+function comprarProducto(indice) {
 
-// CICLO PRINCIPAL DE COMPRAS
-while (seguirComprando) {
+  let respuesta = prompt(
+    "Producto: " + productos[indice] +
+    "\nPrecio: $" + precios[indice] +
+    "\nStock disponible: " + stock[indice] +
+    "\nIngrese la cantidad que desea comprar:"
+  );
 
-    // Limpiamos la selección anterior.
-    codigo = "";
-    producto = "";
-    precio = 0;
-    stock = 0;
+  // Si cancela, salimos de la función
+  if (respuesta === null) {
+    return;
+  }
 
-    // Selección de categoría.
-    let categoria = Number(
-        prompt(
-            "TECHNO HOUSE STORE\n\n" +
-            "1 - Tecno Iluminación\n" +
-            "2 - Energía y Carga\n" +
-            "3 - Bienestar Corporal\n" +
-            "4 - Aire Libre\n" +
-            "0 - Salir"
-        )
+  let cantidad = parseInt(respuesta);
+
+  // Validamos que ingrese una cantidad válida
+  while (cantidad <= 0 || cantidad > stock[indice]) {
+    alert("Cantidad inválida o stock insuficiente.");
+
+    respuesta = prompt(
+      "Stock disponible: " + stock[indice] +
+      "\nIngrese otra cantidad:"
     );
 
-    // Selección de producto según la categoría.
-    switch (categoria) {
-
-        case 1: {
-            let productoIluminacion = Number(
-                prompt(
-                    "TECNO ILUMINACIÓN\n\n" +
-                    "1 - Tira LED\n" +
-                    "2 - Tira Neón LED\n" +
-                    "3 - Guirnalda solar\n" +
-                    "4 - Flores solares\n"
-                )
-            );
-
-            switch (productoIluminacion) {
-
-                case 1:
-                    seleccionarProducto(
-                        codigoTiraLed,
-                        productoTiraLed,
-                        precioTiraLed,
-                        stockTiraLed
-                    );
-                    break;
-
-                case 2:
-                    seleccionarProducto(
-                        codigoTiraNeon,
-                        productoTiraNeon,
-                        precioTiraNeon,
-                        stockTiraNeon
-                    );
-                    break;
-
-                case 3:
-                    seleccionarProducto(
-                        codigoGuirnaldaSolar,
-                        productoGuirnaldaSolar,
-                        precioGuirnaldaSolar,
-                        stockGuirnaldaSolar
-                    );
-                    break;
-
-                case 4:
-                    seleccionarProducto(
-                        codigoFloresSolar,
-                        productoFloresSolar,
-                        precioFloresSolar,
-                        stockFloresSolar
-                    );
-                    break;
-
-                default:
-                    alert("Producto no válido.");
-            }
-
-            break;
-        }
-
-        case 2: {
-            let productoEnergia = Number(
-                prompt(
-                    "ENERGÍA Y CARGA\n\n" +
-                    "1 - Cargador Fast Charge\n" +
-                    "2 - Power Bank\n" +
-                    "3 - Cable USB-C\n"
-                )
-            );
-
-            switch (productoEnergia) {
-
-                case 1:
-                    seleccionarProducto(
-                        codigoCargador,
-                        productoCargador,
-                        precioCargador,
-                        stockCargador
-                    );
-                    break;
-
-                case 2:
-                    seleccionarProducto(
-                        codigoPowerBank,
-                        productoPowerBank,
-                        precioPowerBank,
-                        stockPowerBank
-                    );
-                    break;
-
-                case 3:
-                    seleccionarProducto(
-                        codigoCable,
-                        productoCable,
-                        precioCable,
-                        stockCable
-                    );
-                    break;
-
-                default:
-                    alert("Producto no válido.");
-            }
-
-            break;
-        }
-
-        case 3: {
-            let productoBienestar = Number(
-                prompt(
-                    "BIENESTAR CORPORAL\n\n" +
-                    "1 - Masajeador eléctrico\n" +
-                    "2 - Pistola de masaje\n" +
-                    "3 - Almohada cervical\n"
-                )
-            );
-
-            switch (productoBienestar) {
-
-                case 1:
-                    seleccionarProducto(
-                        codigoMasajeador,
-                        productoMasajeador,
-                        precioMasajeador,
-                        stockMasajeador
-                    );
-                    break;
-
-                case 2:
-                    seleccionarProducto(
-                        codigoPistolaMasaje,
-                        productoPistolaMasaje,
-                        precioPistolaMasaje,
-                        stockPistolaMasaje
-                    );
-                    break;
-
-                case 3:
-                    seleccionarProducto(
-                        codigoAlmohada,
-                        productoAlmohada,
-                        precioAlmohada,
-                        stockAlmohada
-                    );
-                    break;
-
-                default:
-                    alert("Producto no válido.");
-            }
-
-            break;
-        }
-
-        case 4: {
-            let productoAireLibre = Number(
-                prompt(
-                    "AIRE LIBRE\n\n" +
-                    "1 - Kayak Simple\n" +
-                    "2 - Kayak Doble\n" +
-                    "3 - Bicicleta de Agua\n"
-                )
-            );
-
-            switch (productoAireLibre) {
-
-                case 1:
-                    seleccionarProducto(
-                        codigoKayakSimple,
-                        productoKayakSimple,
-                        precioKayakSimple,
-                        stockKayakSimple
-                    );
-                    break;
-
-                case 2:
-                    seleccionarProducto(
-                        codigoKayakDoble,
-                        productoKayakDoble,
-                        precioKayakDoble,
-                        stockKayakDoble
-                    );
-                    break;
-
-                case 3:
-                    seleccionarProducto(
-                        codigoBicicletaAgua,
-                        productoBicicletaAgua,
-                        precioBicicletaAgua,
-                        stockBicicletaAgua
-                    );
-                    break;
-
-                default:
-                    alert("Producto no válido.");
-            }
-
-            break;
-        }
-
-        case 0:
-            seguirComprando = false;
-            break;
-
-        default:
-            alert("Categoría no válida.");
+    // Si cancela, salimos de la función
+    if (respuesta === null) {
+      return;
     }
 
-    // Si se seleccionó un producto, iniciamos la compra.
-    if (producto !== "") {
+    cantidad = parseInt(respuesta);
+  }
 
-        mostrarProducto(codigo, producto, precio, stock);
+  // Agregamos la cantidad de productos al carrito
+  // Aca uso for en lugar de for of porque me parece mas claro
+  for (let i = 0; i < cantidad; i++) {
+    carrito.push(indice);
+  }
 
-        let cantidad = Number(
-            prompt("¿Cuántas unidades querés comprar?")
-        );
+  // Descontamos del stock las unidades compradas
+  stock[indice] = stock[indice] - cantidad;
 
-        // Validamos la cantidad y el stock disponible.
-        if (verificarStock(cantidad, stock)) {
-
-            let total = calcularTotal(precio, cantidad);
-
-            let confirmar = prompt(
-                "RESUMEN DE COMPRA\n\n" +
-                "Producto: " + producto + "\n" +
-                "Código: " + codigo + "\n" +
-                "Cantidad: " + cantidad + "\n" +
-                "Total: $" + total + "\n\n" +
-                "1 - Confirmar compra\n" +
-                "2 - Cancelar"
-            );
-
-            // Solo descontamos stock si se confirma la compra.
-            if (confirmar === "1") {
-
-                stock = actualizarStock(stock, cantidad);
-
-                // Guardamos el stock actualizado en el producto
-
-                switch (codigo) {
-                    case "TH001":
-                        stockTiraLed = stock;
-                        break;
-                    case "TH002":
-                        stockTiraNeon = stock;
-                        break;
-                    case "TH003":
-                        stockGuirnaldaSolar = stock;
-                        break;
-                    case "TH004":
-                        stockFloresSolar = stock;
-                        break;
-                    case "TH005":
-                        stockCargador = stock;
-                        break;
-                    case "TH006":
-                        stockPowerBank = stock;
-                        break;
-                    case "TH007":
-                        stockCable = stock;
-                        break;
-                    case "TH008":
-                        stockMasajeador = stock;
-                        break;
-                    case "TH009":
-                        stockPistolaMasaje = stock;
-                        break;
-                    case "TH010":
-                        stockAlmohada = stock;
-                        break;
-                    case "TH011":
-                        stockKayakSimple = stock;
-                        break;
-                    case "TH012":
-                        stockKayakDoble = stock;
-                        break;
-                    case "TH013":
-                        stockBicicletaAgua = stock;
-                        break;
-                }
-
-                // Confirmamos la operación y mostramos el comprobante.
-                alert(
-                    "COMPRA REALIZADA\n\n" +
-                    "Producto: " + producto + "\n" +
-                    "Cantidad: " + cantidad + "\n" +
-                    "Total: $" + total + "\n\n" +
-                    "Gracias por comprar en TECHNO HOUSE."
-                );
-
-                console.log("Compra realizada");
-                console.log("Código:", codigo);
-                console.log("Producto:", producto);
-                console.log("Cantidad:", cantidad);
-                console.log("Total:", total);
-                console.log("Stock restante:", stock);
-
-            } else {
-
-                alert("Compra cancelada.");
-            }
-
-        } else {
-
-            alert(
-                "No hay stock suficiente o la cantidad ingresada no es válida."
-            );
-        }
-    }
-
-    // Preguntamos si el cliente desea realizar otra compra.
-    if (seguirComprando) {
-
-        let continuar = prompt(
-            "¿Querés seguir comprando?\n\n" +
-            "1 - Sí\n" +
-            "2 - No"
-        );
-
-        if (continuar !== "1") {
-            seguirComprando = false;
-        }
-    }
+  alert("Producto agregado al carrito.");
 }
 
-// FINAL
-alert(
-    "Gracias por visitar TECHNO HOUSE STORE, " +
-    nombreCliente + "."
-);
+
+// VER PRODUCTOS Y COMPRAR
+function verProductos() {
+
+  let catalogo = listarCatalogo();
+  let opcion = prompt(catalogo + "\nIngrese el número del producto que desea comprar.\n0. Volver");
+
+  if (opcion === null || opcion === "0") {
+    return;
+  }
+
+  let indice = Number(opcion) - 1;
+
+  comprarProducto(indice);
+}
+
+
+// VER CARRITO
+function verCarrito() {
+  let opcion = prompt(
+    mostrarCarrito() +
+    "\n1. Eliminar producto" +
+    "\n2. Finalizar compra" +
+    "\n0. Volver",
+  );
+
+  switch (opcion) {
+    case "1":
+      if (carrito.length === 0) {
+
+        alert("El carrito esta vacio.");
+
+      } else {
+        // elimina el ultimo producto agregado al carrito
+        let indice = carrito.pop();
+
+        // al eliminar un producto del carrito, se actualiza el stock
+        stock[indice]++;
+
+        alert(
+          "Se quito " + productos[indice] + " del carrito y se actualizo el stock.",
+        );
+      }
+      break;
+
+    case "2":
+      finalizarCompra();
+      break;
+
+    case "0":
+      break;
+
+    default:
+      alert("Opcion no valida.");
+
+  }
+}
+
+
+// MOSTRAR CARRITO
+// arma un mensaje con los productos del carrito y el total a pagar
+function mostrarCarrito() {
+
+  let mensaje = "MI CARRITO\n";
+  let total = 0;
+
+  if (carrito.length === 0) {
+    return "El carrito esta vacio.";
+  }
+
+  for (const indice of carrito) {
+    mensaje = mensaje + " - " + productos[indice] + " - $" + precios[indice] + "\n";
+
+    total = total + precios[indice];
+  }
+
+  mensaje += "Total: $" + total;
+
+  return mensaje;
+
+}
+
+// BUSCAR PRODUCTOS
+function buscarProducto() {
+  let nombreBuscado = prompt("Ingrese el nombre del producto que busca:");
+
+  if (nombreBuscado === null || nombreBuscado.trim() === "") {
+    return;
+  }
+
+  nombreBuscado = nombreBuscado.toLowerCase();
+
+  let encontrado = false;
+
+  for (const producto of productos) {
+    if (producto.toLowerCase().includes(nombreBuscado)) {
+
+      let indice = productos.indexOf(producto);
+
+      alert(
+        "PRODUCTO ENCONTRADO\n" +
+        codigos[indice] + " - " + producto +
+        "\nPrecio: $" + precios[indice] +
+        "\nStock: " + stock[indice]
+      );
+
+      encontrado = true;
+
+      // Pregunta si desea agregarlo al carrito
+      let opcion = prompt(
+        "¿Desea agregarlo al carrito?\n" +
+        "1. Sí\n" +
+        "0. No"
+      );
+
+      if (opcion === "1") {
+        comprarProducto(indice);
+      }
+    }
+  }
+
+  if (!encontrado) {
+    alert("No se encontraron productos.");
+  }
+}
+
+
+// VER PRODUCTOS DESTACADOS
+function verDestacados() {
+  if (destacados.length === 0) {
+    alert("No hay productos destacados.");
+    return;
+  }
+
+  // Mostramos los productos destacados y elegimos uno.
+  let respuesta = prompt(
+    listarDestacados() +
+    "\nIngrese el número del producto que desea comprar:"
+  );
+
+  if (respuesta === null || respuesta.trim() === "") {
+    return;
+  }
+
+  let posicion = Number(respuesta);
+
+  // Validamos el número ingresado.
+  if (posicion < 1 || posicion > destacados.length
+  ) {
+    alert("Número de producto no válido.");
+    return;
+  }
+
+  // Buscamos el producto elegido.
+  let codigo = destacados[posicion - 1];
+  let indice = buscarIndice(codigo);
+
+  // Enviamos el producto a la función de compra.
+  if (indice !== -1) {
+    comprarProducto(indice);
+  }
+}
+
+
+// ADMINISTRAR PRODUCTOS DESTACADOS
+function administrarDestacados() {
+  let opcion = prompt(
+    "ADMINISTRACION DE DESTACADOS\n" +
+    "1. Agregar producto destacado\n" +
+    "2. Quitar producto destacado\n" +
+    "3. Quitar primer destacado\n" +
+    "4. Reemplazar un destacado\n" +
+    "0. Volver",
+  );
+
+  switch (opcion) {
+    case "1": {
+      let respuesta;
+      let posicion;
+      let codigo;
+
+      while (true) {
+        respuesta = prompt(
+          listarCatalogo() +
+          "\nIngrese el número del producto para destacar:"
+        );
+
+        if (respuesta === null) break;
+
+        posicion = Number(respuesta);
+
+        if (posicion < 1 || posicion > productos.length) {
+          alert("Número no válido.");
+          continue;
+        }
+
+        codigo = codigos[posicion - 1];
+
+        if (destacados.includes(codigo)) {
+          alert("Ese producto ya está destacado. Elija otro.");
+          continue;
+        }
+
+        destacados.push(codigo);
+        alert("Producto agregado a destacados.");
+        break;
+      }
+
+      break;
+    }
+    case "2":
+
+
+      if (destacados.length > 0) {
+
+        // Guardamos el código del último destacado.
+        let codigo = destacados[destacados.length - 1];
+
+        // Buscamos su índice en el catálogo.
+        let indice = buscarIndice(codigo);
+
+        // Guardamos el nombre antes de quitarlo.
+        let producto = productos[indice];
+
+        destacados.pop();
+
+        alert("Se quitó el producto: " + producto);
+
+      } else {
+        alert("No hay destacados para quitar.");
+      }
+      break;
+
+    case "3":
+      if (destacados.length > 0) {
+
+        // Buscamos el nombre del primer destacado.
+        let indice = buscarIndice(destacados[0]);
+
+        let producto = productos[indice];
+
+        // Quitamos el primer destacado.
+        destacados.shift();
+
+        alert("Se quitó el producto: " + producto);
+
+      } else {
+        alert("No hay destacados para quitar.");
+      }
+      break;
+
+
+    case "4": {
+      if (destacados.length === 0) {
+        alert("No hay destacados para reemplazar.");
+        break;
+      }
+
+      // Elegimos qué destacado reemplazar.
+      let respuesta = prompt(
+        listarDestacados() +
+        "\nIngrese el número del destacado que desea reemplazar:"
+      );
+
+      if (respuesta === null) {
+        break;
+      }
+
+      let posicion = Number(respuesta);
+
+      // Validamos la posición elegida.
+      if (posicion < 1 || posicion > destacados.length
+      ) {
+        alert("Posición no válida.");
+        break;
+      }
+
+      // Elegimos el nuevo producto del catálogo.
+      respuesta = prompt(
+        listarCatalogo() +
+        "\nIngrese el número del nuevo producto:"
+      );
+
+      if (respuesta === null) {
+        break;
+      }
+
+      let nuevoIndice = Number(respuesta);
+
+      // Validamos el producto elegido.
+      if (nuevoIndice < 1 || nuevoIndice > productos.length
+      ) {
+        alert("Número no válido.");
+        break;
+      }
+
+      let codigoNuevo = codigos[nuevoIndice - 1];
+
+      // Evitamos repetir productos destacados.
+      if (
+        destacados.includes(codigoNuevo) &&
+        destacados[posicion - 1] !== codigoNuevo
+      ) {
+        alert("Ese producto ya está destacado.");
+      } else {
+        destacados.splice(posicion - 1, 1, codigoNuevo);
+        alert("Destacado reemplazado correctamente.");
+      }
+
+      break;
+    }
+
+    case "0":
+    case null:
+      break;
+
+    default:
+      alert("Opción no válida.");
+  }
+}
+
+// MENU PRINCIPAL
+
+let nombre = prompt("Bienvenido a TECHNO HOUSE STORE.\nIngrese su nombre:");
+
+if (nombre === null || nombre.trim() === "") {
+  nombre = "Cliente";
+}
+
+let opcion = "";
+
+while (opcion !== "0") {
+  opcion = prompt(
+    "TECHNO HOUSE STORE\n" +
+    "Bienvenido, " + nombre + ". Elija una opcion:\n" +
+    "1. Ver tienda\n" +
+    "2. Ver carrito\n" +
+    "3. Buscar producto\n" +
+    "4. Ver catalogo completo\n" +
+    "5. Ver productos destacados\n" +
+    "6. Administrar productos destacados(ADMIN)\n" +
+    "0. Salir\n");
+
+  switch (opcion) {
+    case "1":
+      verProductos();
+      break;
+
+    case "2":
+      verCarrito();
+      break;
+
+    case "3":
+      buscarProducto();
+      break;
+
+    case "4":
+      alert(listarCatalogo());
+      mostrarCatalogoEnConsola();
+      break;
+
+    case "5":
+      verDestacados();
+      break;
+
+    case "6":
+      administrarDestacados();
+      break;
+
+    case "0":
+    case null:
+      opcion = "0";
+      alert("Hasta pronto, " + nombre + ". Gracias por su visita.");
+      break;
+
+    default:
+      alert("Opcion no valida.");
+  }
+}
