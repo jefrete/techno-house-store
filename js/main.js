@@ -170,45 +170,48 @@ function verProductos() {
 
 // VER CARRITO
 function verCarrito() {
-  let opcion = prompt(
-    mostrarCarrito() +
-    "\n1. Eliminar producto" +
-    "\n2. Finalizar compra" +
-    "\n0. Volver",
-  );
+  let opcion = "";
 
-  switch (opcion) {
-    case "1":
-      if (carrito.length === 0) {
+  while (opcion !== "0") {
+    opcion = prompt(
+      mostrarCarrito() +
+      "\n1. Eliminar producto" +
+      "\n2. Finalizar compra" +
+      "\n0. Volver"
+    );
 
-        alert("El carrito esta vacio.");
+    switch (opcion) {
+      case "1":
+        if (carrito.length === 0) {
+          alert("El carrito está vacío.");
+        } else {
+          // Elimina el último producto agregado
+          let indice = carrito.pop();
 
-      } else {
-        // elimina el ultimo producto agregado al carrito
-        let indice = carrito.pop();
+          // Devuelve la unidad al stock
+          stock[indice]++;
 
-        // al eliminar un producto del carrito, se actualiza el stock
-        stock[indice]++;
+          alert(
+            "Se quitó " + productos[indice] +
+            " del carrito y se actualizó el stock."
+          );
+        }
+        break;
 
-        alert(
-          "Se quito " + productos[indice] + " del carrito y se actualizo el stock.",
-        );
-      }
-      break;
+      case "2":
+        finalizarCompra();
+        break;
 
-    case "2":
-      finalizarCompra();
-      break;
+      case "0":
+      case null:
+        opcion = "0";
+        break;
 
-    case "0":
-      break;
-
-    default:
-      alert("Opcion no valida.");
-
+      default:
+        alert("Opción no válida.");
+    }
   }
 }
-
 
 // MOSTRAR CARRITO
 // arma un mensaje con los productos del carrito y el total a pagar
