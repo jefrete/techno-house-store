@@ -80,7 +80,6 @@ function finalizarCompra() {
   }
 }
 
-
 // LISTAR CATÁLOGO DE PRODUCTOS
 function listarCatalogo() {
   let mensaje = "CATÁLOGO DE PRODUCTOS:\n";
@@ -185,16 +184,19 @@ function verCarrito() {
         if (carrito.length === 0) {
           alert("El carrito está vacío.");
         } else {
-          // Elimina el último producto agregado
-          let indice = carrito.pop();
+          // Guardamos el índice del último producto del carrito.
+          let indice = carrito[carrito.length - 1];
 
-          // Devuelve la unidad al stock
+          // Buscamos el nombre del producto.
+          let producto = productos[indice];
+
+          // Eliminamos el último producto del carrito.
+          carrito.pop();
+
+          // Devolvemos una unidad al stock.
           stock[indice]++;
 
-          alert(
-            "Se quitó " + productos[indice] +
-            " del carrito y se actualizó el stock."
-          );
+          alert("Se quitó el producto: " + producto);
         }
         break;
 
