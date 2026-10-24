@@ -84,13 +84,17 @@ function finalizarCompra() {
 // LISTAR CATÁLOGO DE PRODUCTOS
 function listarCatalogo() {
   let mensaje = "CATÁLOGO DE PRODUCTOS:\n";
+  let posicion = 1;
 
   for (const codigo of codigos) {
     let indice = buscarIndice(codigo);
 
-    let linea = codigo + " - " + productos[indice] + " - Precio: $" + precios[indice] + " - Stock: " + stock[indice];
+    let linea = posicion + ". " + codigo + " - " + productos[indice] +
+      " - Precio: $" + precios[indice] +
+      " - Stock: " + stock[indice];
 
     mensaje = mensaje + linea + "\n";
+    posicion++;
   }
 
   return mensaje;
@@ -100,7 +104,6 @@ function listarCatalogo() {
 function mostrarCatalogoEnConsola() {
   console.log(listarCatalogo());
 }
-
 
 // COMPRAR PRODUCTO
 function comprarProducto(indice) {
@@ -153,7 +156,7 @@ function comprarProducto(indice) {
 function verProductos() {
 
   let catalogo = listarCatalogo();
-  let opcion = prompt(catalogo + "\nIngrese el número del producto que desea comprar.\n0. Volver");
+  let opcion = prompt(catalogo + "\nIngrese el número del producto que desea comprar\n0. Volver");
 
   if (opcion === null || opcion === "0") {
     return;
