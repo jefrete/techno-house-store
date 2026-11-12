@@ -1,8 +1,7 @@
-// ENTREGA 5
-// CLASES
-// PRODUCTO: representa cada producto y administra su stock.
+// ENTREGA 5 - TECHNO HOUSE STORE
+// CLASE PRODUCTO
+// Producto es el molde para crear cada cámara.
 class Producto {
-    // El constructor recibe los datos y los guarda en el objeto nuevo.
     constructor(codigo, nombre, categoria, precio, stock) {
         this.codigo = codigo;
         this.nombre = nombre;
@@ -10,570 +9,603 @@ class Producto {
         this.precio = precio;
         this.stock = stock;
     }
-    // "this" representa este producto en particular.
+    // Descuenta unidades si la cantidad es válida y hay stock.
     vender(cantidad) {
+        if (!Number.isInteger(cantidad) || cantidad <= 0 || cantidad > this.stock) {
+            return false;
+        }
         this.stock -= cantidad;
         return true;
     }
-    // Devuelve al stock las unidades que se habían apartado para una compra.
+    // Devuelve unidades al stock.
     reponer(cantidad) {
+        if (!Number.isInteger(cantidad) || cantidad <= 0) {
+            return false;
+        }
         this.stock += cantidad;
         return true;
     }
 }
-// CARRITO: administra los productos de la compra actual.
-class Carrito {
-    // Cada carrito empieza vacío. Cada elemento guardará un producto y su cantidad.
-    constructor() {
-        this.productos = [];
-    }
-    // Agrega un producto o suma unidades si ya existe.
-    agregar(producto, cantidad) {
 
-        producto.vender(cantidad);
-        // Buscamos si este producto ya tiene una línea en el carrito.
-        let productoExistente = null;
-        for (const item of this.productos) {
-            if (item.producto.codigo === producto.codigo) {
-                productoExistente = item;
-                break;
-            }
-        }
-        if (productoExistente) {
-            // Si ya estaba, actualizamos su cantidad en lugar de crear otra línea.
-            productoExistente.cantidad += cantidad;
-        } else {
-            // Si es la primera vez, agregamos una nueva línea.
-            this.productos.push({
-                producto: producto,
-                cantidad: cantidad
-            });
-        }
-        return true;
-    }
+// FUNCIÓN FLECHA: comprueba si un producto tiene stock.
+const tieneStock = producto => producto.stock > 0;
+// FUNCIÓN EXPRESADA: prepara un texto para hacer búsquedas.
+const normalizarTexto = function (texto) {
+    return texto.trim().toLowerCase();
+};
 
-    // Quita el último producto y devuelve sus unidades al stock.
-    quitarUltimo() {
-        // pop quita y devuelve el último elemento del arreglo.
-        const item = this.productos.pop();
-        item.producto.reponer(item.cantidad);
-        return item;
-    }
-
-    // Calcula el importe total.
-    calcularTotal() {
-        let total = 0;
-        // Sumamos precio por cantidad para cada línea del carrito.
-        for (const item of this.productos) {
-            total += item.producto.precio * item.cantidad;
-        }
-        return total;
-    }
-
-    // Cuenta las unidades compradas.
-    contarUnidades() {
-        let total = 0;
-        // Sumamos las cantidades, no los precios.
-        for (const item of this.productos) {
-            total += item.cantidad;
-        }
-        return total;
-    }
-
-    // Arma el listado del carrito.
-    listar() {
-        let listado = "CARRITO";
-        let numero = 0;
-        // Creamos una línea legible para cada artículo.
-        for (const item of this.productos) {
-            numero++;
-            const subtotal = item.producto.precio * item.cantidad;
-            listado += "\n"
-                + numero + ". " + item.producto.nombre +
-                " | Cantidad: " + item.cantidad +
-                " | Subtotal: $" + subtotal;
-        }
-        return listado +
-            "\nTOTAL: $" + this.calcularTotal();
-    }
-
-    // Confirma la compra y vacía el carrito.
-    confirmar() {
-        // Primero guardamos el resultado porque luego se vacía el carrito.
-        const total = this.calcularTotal();
-        const unidades = this.contarUnidades();
-        // Una compra confirmada no devuelve el stock.
-        this.productos = [];
-        return {
-            total: total,
-            unidades: unidades
-        };
-    }
-}
-
-
-// INSTANCIAS: PRODUCTOS
+// Catálogo completo de productos.
 const productos = [
-    // TP-LINK TAPO - INTERIOR
     new Producto("TH001", "Tapo C260 4K 8MP", "Interior", 180000, 5),
     new Producto("TH002", "Tapo C245D Dual 2K + 2K", "Interior", 150000, 5),
     new Producto("TH003", "Tapo C220 2K QHD", "Interior", 100000, 5),
-    // TP-LINK TAPO - EXTERIOR
     new Producto("TH004", "Tapo C560WS 4K 8MP", "Exterior", 220000, 5),
     new Producto("TH005", "Tapo C545D Dual 2K + 2K", "Exterior", 180000, 5),
     new Producto("TH006", "Tapo C530WS 3K 5MP", "Exterior", 140000, 5),
-    // EZVIZ - INTERIOR
     new Producto("TH007", "EZVIZ H6c G1 4K 8MP", "Interior", 170000, 5),
     new Producto("TH008", "EZVIZ H7c Dual 2K+", "Interior", 130000, 5),
     new Producto("TH009", "EZVIZ H1c Full HD", "Interior", 80000, 5),
-    // EZVIZ - EXTERIOR
     new Producto("TH010", "EZVIZ H8c Pro 4K", "Exterior", 200000, 5),
     new Producto("TH011", "EZVIZ H9c Dual 3K", "Exterior", 240000, 5),
     new Producto("TH012", "EZVIZ C8c 3K", "Exterior", 160000, 5)
 ];
 
-// Guardamos los códigos de los productos que aparecen en la sección destacados.
-const destacados = ["TH001", "TH004", "TH007", "TH010"];
-// Creamos un carrito para guardar la compra actual.
-const carrito = new Carrito();
+const destacados = [
+    productos[0],
+    productos[3],
+    productos[6],
+    productos[9]
+];
 
-// PRUEBA DE MÉTODOS DE PRODUCTO
-// Este producto es solo para mostrar cómo cambian el stock vender() y reponer().
-// No forma parte del catálogo de la tienda.
-const productoPrueba = new Producto(
-    "TEST",
-    "Producto de prueba",
-    "Interior",
-    1000,
-    5
-);
+const carrito = [];
 
-console.log("Stock inicial:", productoPrueba.stock);
-console.log("Resultado de venta:", productoPrueba.vender(2));
-console.log("Stock después de vender:", productoPrueba.stock);
-console.log("Resultado de reposición:", productoPrueba.reponer(2));
-console.log("Stock después de reponer:", productoPrueba.stock);
-
-// FUNCIONES GENERALES: buscan productos o preparan textos para mostrar.
-
-// Busca un producto por su código.
-function buscarPorCodigo(codigo) {
-    // Convertimos el código a mayúsculas para que la búsqueda no dependa de eso.
-    const codigoBuscado = String(codigo).trim().toUpperCase();
-    // Recorremos el catálogo hasta encontrar el código.
-    for (const producto of productos) {
-        if (producto.codigo === codigoBuscado) {
-            return producto;
-        }
+// CARRITO-Agrega un producto al carrito y descuenta el stock.
+function agregarAlCarrito(producto, cantidad) {
+    const ventaRealizada = producto.vender(cantidad);
+    // Si no se pudo realizar la venta, terminamos la función.
+    if (ventaRealizada === false) {
+        return false;
     }
-    return null;
+    // Creamos un objeto para guardar la compra.
+    const nuevoItem = {
+        producto: producto,
+        cantidad: cantidad
+    };
+    // Agregamos ese objeto al carrito.
+    carrito.push(nuevoItem);
+    // Informamos que todo salió bien.
+    return true;
 }
 
-// Busca coincidencias en el nombre.
+// Quita el último ingreso del carrito y devuelve su stock.
+function quitarDelCarrito() {
+    if (carrito.length === 0) {
+        return null;
+    }
+    const item = carrito.pop();
+    item.producto.reponer(item.cantidad);
+    return item;
+}
+
+// Calcula el importe total del carrito.
+function calcularTotal() {
+    let total = 0;
+    for (const item of carrito) {
+        total += item.producto.precio * item.cantidad;
+    }
+    return total;
+}
+
+// Cuenta las unidades que hay en el carrito.
+function contarUnidades() {
+    let unidades = 0;
+    for (const item of carrito) {
+        unidades += item.cantidad;
+    }
+    return unidades;
+}
+
+// Guarda los datos de la compra y vacía el carrito.
+function confirmarCompra() {
+    if (carrito.length === 0) {
+        return null;
+    }
+    const compra = {
+        total: calcularTotal(),
+        unidades: contarUnidades()
+    };
+    // El stock queda descontado porque la compra fue confirmada.
+    carrito.length = 0;
+    return compra;
+}
+
+// BÚSQUEDA DE PRODUCTOS
 function buscarPorNombre(nombre) {
-    // Convertimos ambos textos a minúsculas para buscar sin distinguir mayúsculas.
-    const nombreBuscado = String(nombre).trim().toLowerCase();
+    const textoBuscado = normalizarTexto(nombre);
     const resultados = [];
-    // indexOf devuelve -1 si no encuentra el texto buscado.
+    if (textoBuscado === "") {
+        return resultados;
+    }
     for (const producto of productos) {
-        if (producto.nombre.toLowerCase().indexOf(nombreBuscado) !== -1) {
+        if (normalizarTexto(producto.nombre).includes(textoBuscado)) {
             resultados.push(producto);
         }
     }
     return resultados;
 }
 
-// Arma el listado del catálogo.
-function listarCatalogo() {
-    let listado = "CATÁLOGO";
-    let numero = 0;
-    // Agregamos los datos de cada producto al texto del catálogo.
-    for (const producto of productos) {
-        numero++;
-        listado += "\n" + numero + ". " + producto.codigo +
-            " | " + producto.nombre +
-            " | " + producto.categoria +
-            " | $" + producto.precio +
-            " | Stock " + producto.stock;
+// MOSTRAR CARRITO
+function mostrarCarrito() {
+    if (carrito.length === 0) {
+        return "CARRITO\nEl carrito está vacío.\nTOTAL: $0";
     }
-    return listado;
-}
-// Arma el listado de productos destacados.
-function listarDestacados() {
-    let listado = "PRODUCTOS DESTACADOS";
-    let numero = 0;
-    // La lista destacados guarda códigos; buscamos el objeto para mostrar sus datos.
-    for (const codigo of destacados) {
-        const producto = buscarPorCodigo(codigo);
+    let texto = "CARRITO\n";
+    let numero = 1;
+    for (const item of carrito) {
+        texto += numero + ". " + item.producto.nombre +
+            " - Cantidad: " + item.cantidad +
+            " - Subtotal: $" + (item.producto.precio * item.cantidad) + "\n";
         numero++;
-        listado += "\n" + numero + ". " + producto.codigo +
-            " | " + producto.nombre +
-            " | $" + producto.precio;
     }
-    return listado;
+    return texto + "TOTAL: $" + calcularTotal();
 }
 
-// FUNCIONES DE COMPRA: conectan la selección del usuario con el carrito.
-// Agrega el producto seleccionado al carrito.
+// COMPRAR PRODUCTOS: Recibe un producto, pide la cantidad y lo agrega al carrito.
 function comprarProducto(producto) {
-    // prompt devuelve texto; Number convierte ese texto en una cantidad numérica.
-    const cantidadIngresada = prompt(
-        "Producto: " + producto.nombre + "\n" +
-        "Stock disponible: " + producto.stock + "\n" +
-        "Ingrese la cantidad que desea comprar:"
-    );
-    if (cantidadIngresada === null) {
+    if (producto.stock <= 0) {
+        alert("No hay stock disponible de " + producto.nombre + ".");
         return;
     }
-    const cantidad = Number(cantidadIngresada);
-
-    // Evitamos cantidades decimales, cero, negativas o mayores al stock.
-    // Sin esta comprobación, el stock podría quedar negativo.
-    if (!Number.isInteger(cantidad) || cantidad <= 0 || cantidad > producto.stock) {
-        alert("Ingrese una cantidad entera mayor que cero y no superior al stock.");
-        return;
-    }
-
-    // Guardamos el stock anterior para comparar los datos en la consola.
-    const stockAnterior = producto.stock;
-    // El método del carrito descuenta el stock y guarda la compra.
-    const resultado = carrito.agregar(producto, cantidad);
-    console.log("Resultado de la compra:", {
-        producto: producto.nombre,
-        cantidad: cantidad,
-        stockAnterior: stockAnterior,
-        stockFinal: producto.stock,
-        compraExitosa: resultado
-    });
-    alert(
-        "Producto agregado al carrito.\n" +
-        producto.nombre + "\n" +
-        "Unidades: " + cantidad + "\n" +
-        "Stock restante: " + producto.stock
-    );
-}
-
-
-// MENÚ PRINCIPAL
-// OPCIÓN 1: muestra el catálogo y permite elegir un producto.
-function verCatalogoYComprar() {
-    const numeroIngresado = prompt(
-        listarCatalogo() +
-        "\nIngrese el número de producto que desea comprar (0 para volver):"
-    );
-    if (numeroIngresado === null || numeroIngresado === "0") {
-        return;
-    }
-
-    // El usuario cuenta desde 1; los arreglos cuentan sus posiciones desde 0.
-    const numero = Number(numeroIngresado);
-    comprarProducto(productos[numero - 1]);
-}
-
-// OPCIÓN 2: busca productos por nombre y permite elegir un resultado.
-function buscarProductosPorNombre() {
-    const nombre = prompt("Ingrese el nombre o característica que desea buscar:");
-    if (nombre === null) {
-        return;
-    }
-    const resultados = buscarPorNombre(nombre);
-    let productosFormateados = "";
-    let numeroResultado = 0;
-    // Preparamos el texto numerado para que el usuario elija un resultado.
-    for (const producto of resultados) {
-        numeroResultado++;
-        productosFormateados += numeroResultado + ". " +
-            producto.codigo + " | " +
-            producto.nombre + " | " +
-            producto.categoria + " | $" +
-            producto.precio + " | Stock " +
-            producto.stock + "\n";
-    }
-    const numeroIngresado = prompt(
-        "RESULTADOS DE BÚSQUEDA\n" +
-        productosFormateados +
-        "\nIngrese el número del producto que desea comprar (0 para volver):"
-    );
-    if (numeroIngresado === null || numeroIngresado === "0") {
-        // Cancelar o elegir 0 vuelve al menú sin comprar.
-        return;
-    }
-    const numero = Number(numeroIngresado);
-    comprarProducto(resultados[numero - 1]);
-}
-
-// OPCIÓN 3: muestra el carrito y permite elegir una acción.
-function verCarrito() {
-    if (carrito.productos.length === 0) {
-        alert("El carrito está vacío.");
-        return;
-    }
-    let opcion = "";
-    while (opcion !== "0") {
-        opcion = prompt(
-            carrito.listar() + "\n" +
-            "1. Finalizar compra\n" +
-            "2. Quitar último producto\n" +
-            "0. Volver"
+    let cantidad;
+    let cantidadValida = false;
+    // Repetimos el pedido mientras la cantidad no sea válida.
+    while (cantidadValida === false) {
+        // Pedimos al usuario cuántas unidades quiere comprar.
+        const entrada = prompt(
+            "Producto: " + producto.nombre + "\n" +
+            "Stock disponible: " + producto.stock + "\n" +
+            "Ingrese la cantidad que desea comprar:"
         );
-        if (opcion === null || opcion === "0") {
+        // Si cancela, terminamos la función.
+        if (entrada === null) {
             return;
         }
+        // Convertimos el texto ingresado a número.
+        cantidad = Number(entrada);
+        // Comprobamos que sea un entero entre 1 y el stock disponible.
+        if (
+            Number.isInteger(cantidad) &&
+            cantidad >= 1 &&
+            cantidad <= producto.stock
+        ) {
+            cantidadValida = true;
+        } else {
+            alert("Ingrese una cantidad entera entre 1 y " + producto.stock + ".");
+        }
+    }
+    // Intentamos agregar el producto al carrito.
+    const agregado = agregarAlCarrito(producto, cantidad);
+    // Si se agregó correctamente, mostramos los datos de la compra.
+    if (agregado === true) {
+        alert(
+            "Producto agregado al carrito.\n" +
+            producto.nombre + "\n" +
+            "Unidades: " + cantidad + "\n" +
+            "Stock restante: " + producto.stock
+        );
+    }
+}
+
+// Opción 1: muestra el catálogo y permite comprar.
+function verCatalogoYComprar() {
+    let texto = "CATÁLOGO DE PRODUCTOS\n";
+    let numero = 1;
+    // Armamos directamente la lista del catálogo.
+    for (const producto of productos) {
+        texto += numero + ". " + producto.codigo + " - " +
+            producto.nombre + " - " + producto.categoria +
+            " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+        numero++;
+    }
+    // Mostramos la lista y pedimos el número del producto.
+    const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
+    if (entrada === null || entrada.trim() === "") {
+        return;
+    }
+    const numeroElegido = Number(entrada);
+    if (numeroElegido === 0) {
+        return;
+    }
+    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > productos.length) {
+        alert("Seleccione un número válido del catálogo.");
+        return;
+    }
+    comprarProducto(productos[numeroElegido - 1]);
+}
+
+// Opción 2: busca por nombre y permite comprar.
+function buscarYComprar() {
+    const nombre = prompt("Ingrese el nombre o característica que desea buscar:");
+    // Si se cancela el prompt o solo se ingresan espacios, no hay nada que buscar.
+    if (nombre === null || normalizarTexto(nombre) === "") {
+        return;
+    }
+    // La función de búsqueda devuelve un arreglo con los productos coincidentes.
+    const resultados = buscarPorNombre(nombre);
+    // Avisamos y terminamos si la búsqueda no encontró coincidencias.
+    if (resultados.length === 0) {
+        alert("No se encontraron productos.");
+        return;
+    }
+    // Preparamos el texto que mostrará los resultados numerados.
+    let texto = "RESULTADOS DE LA BÚSQUEDA\n";
+    let numero = 1;
+    // Agregamos los datos de cada producto y aumentamos su número en la lista.
+    for (const producto of resultados) {
+        texto += numero + ". " + producto.codigo + " - " +
+            producto.nombre + " - " + producto.categoria +
+            " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+        numero++;
+    }
+    // Mostramos los resultados y pedimos el número del producto que se quiere comprar.
+    const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
+    // Si se cancela o se deja vacío el prompt, volvemos al menú anterior.
+    if (entrada === null || entrada.trim() === "") {
+        return;
+    }
+    // prompt devuelve texto; lo convertimos a número para validar la opción elegida.
+    const numeroElegido = Number(entrada);
+    // La opción 0 permite volver sin seleccionar un producto.
+    if (numeroElegido === 0) {
+        return;
+    }
+    // Rechazamos valores que no sean enteros o que estén fuera de la lista mostrada.
+    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > resultados.length) {
+        alert("Seleccione un número válido de los resultados.");
+        return;
+    }
+    // La lista visible empieza en 1, pero los arreglos usan índices desde 0.
+    // Restamos 1 para obtener el producto elegido y pasarlo al flujo de compra.
+    comprarProducto(resultados[numeroElegido - 1]);
+}
+
+// Opción 4: muestra los destacados y permite comprar.
+function verDestacadosYComprar() {
+    if (destacados.length === 0) {
+        alert("No hay productos destacados.");
+        return;
+    }
+    let texto = "PRODUCTOS DESTACADOS\n";
+    let numero = 1;
+    // Armamos directamente la lista de productos destacados.
+    for (const producto of destacados) {
+        texto += numero + ". " + producto.codigo + " - " +
+            producto.nombre + " - " + producto.categoria +
+            " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+        numero++;
+    }
+    const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
+    if (entrada === null || entrada.trim() === "") {
+        return;
+    }
+    const numeroElegido = Number(entrada);
+    if (numeroElegido === 0) {
+        return;
+    }
+    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > destacados.length) {
+        alert("Seleccione un número válido de destacados.");
+        return;
+    }
+    comprarProducto(destacados[numeroElegido - 1]);
+}
+// Opcion 3: muestra el carrito y permite finalizar la compra o quitar productos.
+function verCarrito() {
+    let opcion;
+    while (opcion !== "0" && opcion !== null) {
+        opcion = prompt(
+            mostrarCarrito() + "\n\n" +
+            "1. Finalizar compra\n" +
+            "2. Quitar el último producto\n" +
+            "0. Volver"
+        );
         if (opcion === "1") {
-            finalizarCompra();
-            if (carrito.productos.length === 0) {
-                // confirmar() vacía el carrito; por eso ya no hay nada más que administrar.
+            if (carrito.length === 0) {
+                alert("El carrito está vacío.");
+            } else if (confirm(mostrarCarrito() + "\n¿Desea confirmar la compra?")) {
+                const compra = confirmarCompra();
+                alert(
+                    "Compra confirmada.\n" +
+                    "Unidades: " + compra.unidades + "\n" +
+                    "Total: $" + compra.total
+                );
+                // Terminamos verCarrito() para que no vuelva a aparecer el menú vacío.
                 return;
             }
         } else if (opcion === "2") {
-            const item = carrito.quitarUltimo();
-            alert(
-                "Se ha eliminado " + item.producto.nombre + " del carrito.\n" +
-                "Unidades devueltas al stock: " + item.cantidad
-            );
-            if (carrito.productos.length === 0) {
-                // Si quitamos el único artículo, cerramos el submenú.
+            if (carrito.length === 0) {
                 alert("El carrito está vacío.");
-                return;
+            } else {
+                const item = quitarDelCarrito();
+                alert("Se quitó " + item.producto.nombre + " y se devolvió al stock.");
             }
+        } else if (opcion !== "0" && opcion !== null) {
+            alert("Seleccione una opción válida.");
         }
     }
 }
-
-// FINALIZAR COMPRA
-function finalizarCompra() {
-    // confirm deja que el usuario decida si confirma o vuelve atrás.
-    const confirmar = confirm(
-        carrito.listar() + "\n¿Desea confirmar la compra?"
-    );
-    if (!confirmar) {
-        // No se cambia el carrito si el usuario elige cancelar este diálogo.
-        return;
-    }
-    const compra = carrito.confirmar();
-    alert(
-        "¡Compra confirmada!\n" +
-        "Unidades: " + compra.unidades + "\n" +
-        "Total: $" + compra.total
-    );
-}
-
-// OPCIÓN 4: busca los objetos destacados y permite elegir uno para comprar.
-function verDestacadosYComprar() {
-    const productosDestacados = [];
-    let listado = "PRODUCTOS DESTACADOS";
-    let numeroListado = 0;
-    for (const codigo of destacados) {
-        // Convertimos cada código destacado en el objeto Producto correspondiente.
-        const producto = buscarPorCodigo(codigo);
-        productosDestacados.push(producto);
-        numeroListado++;
-        listado += "\n" + numeroListado + ". " +
-            producto.codigo + " | " +
-            producto.nombre + " | $" +
-            producto.precio + " | Stock " +
-            producto.stock;
-    }
-    const numeroIngresado = prompt(
-        listado +
-        "\nIngrese el número del producto que desea comprar (0 para volver):"
-    );
-    if (numeroIngresado === null || numeroIngresado === "0") {
-        return;
-    }
-    const numero = Number(numeroIngresado);
-    comprarProducto(productosDestacados[numero - 1]);
-}
-
-// OPCIÓN 5: permite agregar, quitar, reemplazar o mostrar destacados.
-function verDestacados() {
-    alert(listarDestacados());
-}
-
-// Devuelve la posición del producto si ya está destacado.
-// Si no lo encuentra, devuelve -1.
-function buscarPosicionDestacado(codigo) {
-    let posicion = 0;
-
-    for (const codigoDestacado of destacados) {
-        if (codigoDestacado === codigo) {
-            return posicion;
-        }
-        posicion++;
-    }
-
-    return -1;
-}
-
+// Opción 5: permite administrar los productos destacados. 
 function administrarDestacados() {
-    let opcion = "";
-    while (opcion !== "0") {
-        // El submenú se repite hasta volver o cancelar el diálogo.
+    let opcion;
+    // El menú se repite hasta elegir "0" o cancelar el prompt.
+    while (opcion !== "0" && opcion !== null) {
         opcion = prompt(
             "ADMINISTRAR DESTACADOS\n" +
-            "1. Agregar producto destacado\n" +
-            "2. Fijar producto destacado al comienzo\n" +
-            "3. Quitar último producto destacado\n" +
-            "4. Reemplazar producto destacado\n" +
+            "1. Agregar producto\n" +
+            "2. Fijar producto al comienzo\n" +
+            "3. Quitar el último producto\n" +
+            "4. Reemplazar un producto por posición\n" +
             "5. Ver destacados\n" +
             "0. Volver"
         );
-        if (opcion === null) {
-            break;
-        }
+        // Según la opción elegida, ejecutamos una acción distinta sobre destacados.
         switch (opcion) {
-            // Agrega al final.
+            //agregar un producto al final de destacados.
             case "1": {
-                let productoAgregado = false;
-                while (!productoAgregado) {
-                    // Convertimos el número elegido en el producto de esa posición.
-                    const numeroIngresado = prompt(
-                        listarCatalogo() +
-                        "\nIngrese el número del producto que desea agregar:"
-                    );
-                    if (numeroIngresado === null) {
-                        break;
-                    }
-                    const numero = Number(numeroIngresado);
-                    const producto = productos[numero - 1];
-                    const posicion = buscarPosicionDestacado(producto.codigo);
-
-                    if (posicion !== -1) {
-                        alert("Ese producto ya está en destacados. Elija otro.");
-                    } else {
-                        destacados.push(producto.codigo);
-                        alert("Producto agregado a destacados.");
-                        productoAgregado = true;
-                    }
+                let texto = "CATÁLOGO DE PRODUCTOS\n";
+                let numero = 1;
+                // Recorremos el catálogo para armar el listado.
+                for (const producto of productos) {
+                    texto += numero + ". " + producto.codigo + " - " +
+                        producto.nombre + " - " + producto.categoria +
+                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                    numero++;
                 }
-                break;
-            }
-            // Fija al principio.
-            case "2": {
-                const numero = Number(prompt(
-                    listarCatalogo() +
-                    "\nIngrese el número del producto que desea fijar:"
-                ));
-                const producto = productos[numero - 1];
-
-                // Si ya estaba destacado, lo quitamos de su posición anterior.
-                const posicion = buscarPosicionDestacado(producto.codigo);
-                if (posicion !== -1) {
-                    destacados.splice(posicion, 1);
-                }
-
-                // unshift lo agrega al comienzo sin crear un duplicado.
-                destacados.unshift(producto.codigo);
-                alert("Producto fijado al comienzo de destacados.");
-                break;
-            }
-            // Quita el último.
-            case "3": {
-                // pop quita el último código destacado.
-                const eliminado = destacados.pop();
-                const producto = buscarPorCodigo(eliminado);
-                alert("Se eliminó " + producto.nombre + " de destacados.");
-                break;
-            }
-            // Reemplaza un destacado.
-            case "4": {
-                // Los números mostrados empiezan en 1, por eso restamos 1 para usarlos como índices.
-                const posicionIngresada = prompt(
-                    listarDestacados() +
-                    "\nIngrese el número del destacado que desea reemplazar:"
-                );
-                if (posicionIngresada === null) {
+                // Pedimos qué producto queremos agregar.
+                const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
+                // Si cancela o deja vacío, volvemos al menú.
+                if (entrada === null || entrada.trim() === "") {
                     break;
                 }
-                const posicion = Number(posicionIngresada) - 1;
-                let reemplazoRealizado = false;
-
-                while (!reemplazoRealizado) {
-                    const numeroIngresado = prompt(
-                        listarCatalogo() +
-                        "\nIngrese el número del producto que lo reemplazará:"
-                    );
-                    if (numeroIngresado === null) {
-                        break;
-                    }
-
-                    const numeroProducto = Number(numeroIngresado);
-                    const nuevoProducto = productos[numeroProducto - 1];
-                    const posicionExistente = buscarPosicionDestacado(nuevoProducto.codigo);
-
-                    if (posicionExistente !== -1 && posicionExistente !== posicion) {
-                        alert("Ese producto ya está en destacados. Elija otro.");
-                    } else {
-                        // splice cambia el destacado elegido por el nuevo producto.
-                        destacados.splice(posicion, 1, nuevoProducto.codigo);
-                        alert("Destacado reemplazado correctamente.");
-                        reemplazoRealizado = true;
-                    }
+                const numeroElegido = Number(entrada);
+                // El 0 permite volver al menú.
+                if (numeroElegido === 0) {
+                    break;
+                }
+                // Validamos que el número corresponda a un producto.
+                if (!Number.isInteger(numeroElegido) ||
+                    numeroElegido < 1 ||
+                    numeroElegido > productos.length) {
+                    alert("Seleccione un número válido.");
+                    break;
+                }
+                // Obtenemos el producto elegido.
+                const producto = productos[numeroElegido - 1];
+                // Comprobamos si ya está en destacados.
+                if (destacados.includes(producto)) {
+                    alert("Ese producto ya está en destacados.");
+                } else {
+                    // Agregamos el producto al final del array.
+                    destacados.push(producto);
+                    alert(producto.nombre + " se agregó a destacados.");
                 }
                 break;
             }
-            // Muestra los destacados.
-            case "5":
-                verDestacados();
+            // Fijar un producto al comienzo de destacados.
+            case "2": {
+                let texto = "CATÁLOGO DE PRODUCTOS\n";
+                let numero = 1;
+                // Recorremos el catálogo para armar el listado.
+                for (const producto of productos) {
+                    texto += numero + ". " + producto.codigo + " - " +
+                        producto.nombre + " - " + producto.categoria +
+                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                    numero++;
+                }
+                // Pedimos qué producto queremos colocar al comienzo.
+                const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
+                // Si cancela o deja vacío, volvemos al menú.
+                if (entrada === null || entrada.trim() === "") {
+                    break;
+                }
+                const numeroElegido = Number(entrada);
+                // El 0 permite volver al menú.
+                if (numeroElegido === 0) {
+                    break;
+                }
+                // Validamos que el número corresponda a un producto.
+                if (!Number.isInteger(numeroElegido) ||
+                    numeroElegido < 1 ||
+                    numeroElegido > productos.length) {
+                    alert("Seleccione un número válido.");
+                    break;
+                }
+                // Obtenemos el producto elegido.
+                const producto = productos[numeroElegido - 1];
+                // Buscamos si el producto ya está en destacados.
+                const posicionActual = destacados.indexOf(producto);
+                // Si ya existe, lo quitamos de su posición anterior.
+                if (posicionActual !== -1) {
+                    destacados.splice(posicionActual, 1);
+                }
+                // Colocamos el producto al comienzo.
+                destacados.unshift(producto);
+                alert(producto.nombre + " quedó primero en destacados.");
                 break;
+            }
+            // Quitar el último producto de destacados.
+            case "3": {
+                // Quitamos el último producto del array.
+                const quitado = destacados.pop();
+                // Comprobamos si pop() encontró un producto.
+                if (quitado !== undefined) {
+                    alert(quitado.nombre + " se quitó de destacados.");
+                } else {
+                    alert("No hay productos destacados para quitar.");
+                }
+                break;
+            }
+            // REEMPLAZAR UN PRODUCTO POR POSICIÓN
+            case "4": {
+                if (destacados.length === 0) {
+                    alert("No hay destacados para reemplazar.");
+                    continue;
+                }
+                let textoDestacados = "PRODUCTOS DESTACADOS\n";
+                let numero = 1;
+                // Mostramos los destacados numerados para elegir cuál será reemplazado.
+                for (const producto of destacados) {
+                    textoDestacados += numero + ". " + producto.codigo + " - " +
+                        producto.nombre + " - " + producto.categoria +
+                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                    numero++;
+                }
+                // Pedimos la posición actual del destacado que se quiere cambiar.
+                const entradaPosicion = prompt(
+                    textoDestacados + "\n¿Qué número desea reemplazar?\n0. Volver"
+                );
+                // Cancelar o dejar vacío vuelve al menú sin hacer cambios.
+                if (entradaPosicion === null || entradaPosicion.trim() === "") {
+                    continue;
+                }
+                // Convertimos la posición ingresada para validarla y usarla como índice.
+                const posicion = Number(entradaPosicion);
+                // El 0 cancela la operación y regresa al menú de administración.
+                if (posicion === 0) {
+                    continue;
+                }
+                // La posición debe ser un entero dentro de los destacados actuales.
+                if (!Number.isInteger(posicion) ||
+                    posicion < 1 ||
+                    posicion > destacados.length) {
+                    alert("Seleccione una posición válida.");
+                    continue;
+                }
+                // Mostramos el catálogo completo para elegir el producto que ocupará esa posición.
+                let textoCatalogo = "CATÁLOGO DE PRODUCTOS\n";
+                numero = 1;
+                for (const producto of productos) {
+                    textoCatalogo += numero + ". " + producto.codigo + " - " +
+                        producto.nombre + " - " + producto.categoria +
+                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                    numero++;
+                }
+                // Pedimos el producto nuevo; 0 permite cancelar el reemplazo.
+                const entradaProducto = prompt(
+                    textoCatalogo + "\nIngrese el número del producto nuevo:\n0. Volver"
+                );
+                // Cancelar o dejar vacío no cambia la lista de destacados.
+                if (entradaProducto === null || entradaProducto.trim() === "") {
+                    continue;
+                }
+                // Convertimos el número elegido para validar que corresponda al catálogo.
+                const numeroProducto = Number(entradaProducto);
+                // Si se ingresa 0, no se realiza el reemplazo.
+                if (numeroProducto === 0) {
+                    continue;
+                }
+                // Rechazamos valores no enteros o fuera de las opciones del catálogo.
+                if (!Number.isInteger(numeroProducto) ||
+                    numeroProducto < 1 ||
+                    numeroProducto > productos.length) {
+                    alert("Seleccione un producto válido.");
+                    continue;
+                }
+                // Convertimos el número visible (que empieza en 1) a índice (que empieza en 0).
+                const productoNuevo = productos[numeroProducto - 1];
+                // Comprobamos si el producto ya ocupa una posición en destacados.
+                const posicionExistente = destacados.indexOf(productoNuevo);
+                // Se permite elegir el mismo producto que ya ocupa la posición a reemplazar,
+                // pero no duplicar uno que esté en otra posición.
+                if (posicionExistente !== -1 && posicionExistente !== posicion - 1) {
+                    alert("Ese producto ya está en otra posición de destacados.");
+                    continue;
+                }
+                // splice reemplaza un elemento: índice, cantidad a quitar, elemento nuevo.
+                destacados.splice(posicion - 1, 1, productoNuevo);
+                alert("Se reemplazó el producto de la posición " + posicion + ".");
+                // Salimos del switch; el menú vuelve a mostrarse en la siguiente vuelta.
+                break;
+            }
+            // ver destacados
+            case "5": {
+                let texto = "PRODUCTOS DESTACADOS\n";
+                let numero = 1;
+                // Preparamos un listado numerado con los datos actuales de cada destacado.
+                for (const producto of destacados) {
+                    texto += numero + ". " + producto.codigo + " - " +
+                        producto.nombre + " - " + producto.categoria +
+                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                    numero++;
+                }
+                alert(texto);
+                // Salimos del switch; el menú vuelve a mostrarse en la siguiente vuelta.
+                break;
+            }
+            // VOLVER O CANCELAR
             case "0":
+            case null:
+                // finaliza el menú.
                 break;
+            default:
+                alert("Seleccione una opción válida.");
         }
     }
 }
-
-// OPCIÓN 6: IMPRIMIR CATÁLOGO EN CONSOLA
-const imprimirCatalogoEnConsola = () => {
-    console.log(listarCatalogo());
-};
-
-// MENÚ PRINCIPAL: punto desde donde el usuario accede a las funciones.
+// MENÚ PRINCIPAL
 function iniciarTienda() {
-    const nombreIngresado = prompt(
-        "Bienvenido a TECHNO HOUSE STORE.\nIngrese su nombre:"
-    );
-    const nombre = nombreIngresado;
+    const nombre = prompt("Bienvenido a TECHNO HOUSE STORE.\nIngrese su nombre:");
     let opcion = "";
-    while (opcion !== "0") {
+    while (opcion !== "0" && opcion !== null) {
         opcion = prompt(
             "TECHNO HOUSE STORE\n" +
-            "Bienvenido, " + nombre + ".\n" +
+            "Hola, " + nombre + ".\n" +
             "1. Ver catálogo completo\n" +
             "2. Buscar producto por nombre\n" +
             "3. Ver carrito\n" +
-            "4. Ver destacados\n" +
+            "4. Ver productos destacados\n" +
             "5. Administrar destacados\n" +
-            "6. Imprimir catálogo completo en la consola\n" +
+            "6. Imprimir catálogo en la consola\n" +
             "0. Salir"
         );
-        if (opcion === null) {
-            break;
-        }
-
-        switch (opcion) {
-            case "1":
-                verCatalogoYComprar();
-                break;
-            case "2":
-                buscarProductosPorNombre();
-                break;
-            case "3":
-                verCarrito();
-                break;
-            case "4":
-                verDestacadosYComprar();
-                break;
-            case "5":
-                administrarDestacados();
-                break;
-            case "6":
-                imprimirCatalogoEnConsola();
-                break;
-            case "0":
-                break;
+        if (opcion === "1") {
+            verCatalogoYComprar();
+        } else if (opcion === "2") {
+            buscarYComprar();
+        } else if (opcion === "3") {
+            verCarrito();
+        } else if (opcion === "4") {
+            verDestacadosYComprar();
+        } else if (opcion === "5") {
+            administrarDestacados();
+        } else if (opcion === "6") {
+            let texto = "CATÁLOGO DE PRODUCTOS\n";
+            let numero = 1;
+            // Armamos el catálogo directamente para mostrarlo en consola.
+            for (const producto of productos) {
+                texto += numero + ". " + producto.codigo + " - " +
+                    producto.nombre + " - " + producto.categoria +
+                    " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                numero++;
+            }
+            console.log(texto);
+        } else if (opcion !== "0" && opcion !== null) {
+            alert("Seleccione una opción válida.");
         }
     }
     alert("Gracias por visitar TECHNO HOUSE STORE, " + nombre + ".");
 }
-
+// TEST EN CONSOLA
+// quita y suma stock de un producto para comprobar que vender() y reponer() funcionan correctamente.
+console.log("TEST: probando vender() y reponer().");
+const productoPrueba = productos[0];
+console.log("Producto:", productoPrueba.nombre);
+console.log("Stock inicial:", productoPrueba.stock);
+console.log("¿Tiene stock?:", tieneStock(productoPrueba));
+// Vendemos 2 unidades.
+productoPrueba.vender(2);
+console.log("Stock después de vender 2:", productoPrueba.stock);
+// Reponemos las mismas 2 unidades.
+productoPrueba.reponer(2);
+console.log("Stock después de reponer 2:", productoPrueba.stock);
+//iniciar simulador de tienda.
 iniciarTienda();
