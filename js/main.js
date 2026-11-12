@@ -567,29 +567,40 @@ function iniciarTienda() {
             "6. Imprimir catálogo en la consola\n" +
             "0. Salir"
         );
-        if (opcion === "1") {
-            verCatalogoYComprar();
-        } else if (opcion === "2") {
-            buscarYComprar();
-        } else if (opcion === "3") {
-            verCarrito();
-        } else if (opcion === "4") {
-            verDestacadosYComprar();
-        } else if (opcion === "5") {
-            administrarDestacados();
-        } else if (opcion === "6") {
-            let texto = "CATÁLOGO DE PRODUCTOS\n";
-            let numero = 1;
-            // Armamos el catálogo directamente para mostrarlo en consola.
-            for (const producto of productos) {
-                texto += numero + ". " + producto.codigo + " - " +
-                    producto.nombre + " - " + producto.categoria +
-                    " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                numero++;
+        switch (opcion) {
+            case "1":
+                verCatalogoYComprar();
+                break;
+            case "2":
+                buscarYComprar();
+                break;
+            case "3":
+                verCarrito();
+                break;
+            case "4":
+                verDestacadosYComprar();
+                break;
+            case "5":
+                administrarDestacados();
+                break;
+            case "6": {
+                let texto = "CATÁLOGO DE PRODUCTOS\n";
+                let numero = 1;
+                // Armamos el catálogo directamente para mostrarlo en consola.
+                for (const producto of productos) {
+                    texto += numero + ". " + producto.codigo + " - " +
+                        producto.nombre + " - " + producto.categoria +
+                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
+                    numero++;
+                }
+                console.log(texto);
+                break;
             }
-            console.log(texto);
-        } else if (opcion !== "0" && opcion !== null) {
-            alert("Seleccione una opción válida.");
+            case "0":
+            case null:
+                break;
+            default:
+                alert("Seleccione una opción válida.");
         }
     }
     alert("Gracias por visitar TECHNO HOUSE STORE, " + nombre + ".");
