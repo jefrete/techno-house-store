@@ -175,7 +175,7 @@ function comprarProducto(lista) {
   // Presentamos la lista y esperamos el número elegido por el usuario.
   const productoSeleccionado = prompt(
     textoLista +
-    "\n\nIngrese el número del producto deseado:\n0. Volver"
+    "Ingrese el número del producto deseado:\n0. Volver"
   );
 
   // validamos cancelar, dejar vacio
@@ -297,7 +297,7 @@ function administrarDestacados() {
     switch (opcion) {
       case "1": {
         // elegir un producto del catálogo para agregarlo a destacados.
-        let textoCatalogo = "CATÁLOGO\n";
+        let textoCatalogo = "CATÁLOGO";
         productos.forEach((producto, indice) => {
           textoCatalogo += (indice + 1) + ". " + producto.codigo + " - " +
             producto.nombre + " (" + producto.categoria + ") - $" +
@@ -477,7 +477,7 @@ function iniciarTienda() {
   // Repetimos el menú principal hasta que el usuario salga o cancele.
   while (opcion !== "0" && opcion !== null) {
     opcion = prompt(
-      "TECHNO HOUSE STORE - Hola, " + nombre + ".\n\n" +
+      "TECHNO HOUSE STORE - Hola, " + nombre + ".\n" +
       "1. Ver catálogo completo\n" +
       "2. Ver cámaras de interior\n" +
       "3. Ver cámaras de exterior\n" +
@@ -488,7 +488,6 @@ function iniciarTienda() {
       "8. Imprimir catálogo en la consola\n" +
       "0. Salir"
     );
-
     switch (opcion) {
       case "1":
         // Comprar desde el catalogo completo
