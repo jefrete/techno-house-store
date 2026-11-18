@@ -227,7 +227,7 @@ function verCarrito() {
   // El menú sigue apareciendo hasta elegir volver o cancelar.
   while (opcion !== "0" && opcion !== null) {
     opcion = prompt(
-      mostrarCarrito() + "\n\n" +
+      mostrarCarrito() + "\n" +
       "1. Finalizar compra\n" +
       "2. Quitar el último producto\n" +
       "0. Volver"
