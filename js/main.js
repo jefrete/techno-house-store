@@ -238,7 +238,7 @@ function verCarrito() {
       case "1": {
         if (carrito.length === 0) {
           alert("El carrito está vacío.");
-        } else if (confirm(mostrarCarrito() + "\n\n¿Desea confirmar la compra?")) {
+        } else if (confirm(mostrarCarrito() + "\n¿Desea confirmar la compra?")) {
           // confirmarCompra() guarda el total y vacía el carrito.
           const compra = confirmarCompra();
           alert(
@@ -291,7 +291,7 @@ function administrarDestacados() {
     switch (opcion) {
       case "1": {
         // elegir un producto del catálogo para agregarlo a destacados.
-        let textoCatalogo = "CATÁLOGO";
+        let textoCatalogo = "CATÁLOGO\n";
         productos.forEach((producto, indice) => {
           textoCatalogo += (indice + 1) + ". " + producto.codigo + " - " +
             producto.nombre + " (" + producto.categoria + ") - $" +
@@ -300,7 +300,7 @@ function administrarDestacados() {
 
         const entrada = prompt(
           textoCatalogo +
-          "\n\nIngrese el número del producto:\n0. Volver"
+          "\nIngrese el número del producto:\n0. Volver"
         );
         // Cancelar o elegir 0 vuelve al menú de destacados.
         if (!entrada || entrada.trim() === "0") break;
@@ -337,7 +337,7 @@ function administrarDestacados() {
 
         const entrada = prompt(
           textoCatalogo +
-          "\n\nIngrese el número del producto:\n0. Volver"
+          "\nIngrese el número del producto:\n0. Volver"
         );
         if (!entrada || entrada.trim() === "0") break;
 
@@ -389,7 +389,7 @@ function administrarDestacados() {
 
         const posicion = prompt(
           textoDestacados +
-          "\n\n¿Qué número desea reemplazar?\n0. Volver"
+          "¿Qué número desea reemplazar?\n0. Volver"
         );
 
         if (!posicion || posicion.trim() === "0") break;
@@ -411,7 +411,7 @@ function administrarDestacados() {
 
         const entradaProducto = prompt(
           textoCatalogo +
-          "\n\nIngrese el número del producto nuevo:\n0. Volver"
+          "\nIngrese el número del producto nuevo:\n0. Volver"
         );
 
         if (!entradaProducto || entradaProducto.trim() === "0") break;
