@@ -164,65 +164,59 @@ function comprarProducto(lista) {
     return;
   }
 
-  // Armamos el listado numerado en el momento de mostrarlo.
-  let textoLista = "PRODUCTOS DISPONIBLES\n";
-  lista.forEach((producto, indice) => {
-    textoLista += (indice + 1) + ". " + producto.codigo + " - " +
-      producto.nombre + " (" + producto.categoria + ") - $" +
-      producto.precio + " - Stock: " + producto.stock + "\n";
-  });
-
-  // Presentamos la lista y esperamos el número elegido por el usuario.
-  const productoSeleccionado = prompt(
-    textoLista +
-    "Ingrese el número del producto deseado:\n0. Volver"
-  );
-
-  // validamos cancelar, dejar vacio
-  if (!productoSeleccionado || productoSeleccionado.trim() === "0") return;
-
-  // Convertimos el texto del prompt en número
-  const numeroElegido = Number(productoSeleccionado);
-
-  //validamos indice
-  if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > lista.length) {
-    alert("Seleccione un número válido.");
-    return;
-  }
-
-  // Las opciones empiezan en 1, pero el array empieza en 0
-  const producto = lista[numeroElegido - 1];
-
-  // validamos stock
-  if (!(producto.stock > 0)) {
-    alert("No hay stock disponible de " + producto.nombre + ".");
-    return;
-  }
-
-  // Repetimos la solicitud hasta que se ingrese una cantidad válida
   while (true) {
-    const cantidadSeleccionada = prompt(
-      "Producto: " + producto.nombre + " ($" + producto.precio + ")\n" +
-      "Stock disponible: " + producto.stock + "\n" +
-      "Ingrese la cantidad que desea comprar:"
+    // Armamos el listado cada vez para reflejar el stock actualizado.
+    let textoLista = "PRODUCTOS DISPONIBLES\n";
+    lista.forEach((producto, indice) => {
+      textoLista += (indice + 1) + ". " + producto.codigo + " - " +
+        producto.nombre + " (" + producto.categoria + ") - $" +
+        producto.precio + " - Stock: " + producto.stock + "\n";
+    });
+
+    const productoSeleccionado = prompt(
+      textoLista +
+      "Ingrese el número del producto deseado:\n0. Volver"
     );
 
-    // validamos cancelar
-    if (cantidadSeleccionada === null) return;
+    if (!productoSeleccionado || productoSeleccionado.trim() === "0") return;
 
-    const cantidad = Number(cantidadSeleccionada);
-    // agregarAlCarrito valida la cantidad, descuenta stock y actualiza el carrito.
-    //si devuelve true mostramos mensaje
-    if (agregarAlCarrito(producto, cantidad)) {
-      alert(
-        "Agregado al carrito:\n" + cantidad + "x " +
-        producto.nombre + "\nStock restante: " + producto.stock
-      );
-      return;
+    const numeroElegido = Number(productoSeleccionado);
+
+    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > lista.length) {
+      alert("Seleccione un número válido.");
+      continue;
     }
 
-    // si devuelve false informamos el rango permitido y volvemos a pedir ingreso
-    alert("Ingrese una cantidad entera entre 1 y " + producto.stock + ".");
+    // Las opciones empiezan en 1, pero el array empieza en 0.
+    const producto = lista[numeroElegido - 1];
+
+    if (!(producto.stock > 0)) {
+      alert("No hay stock disponible de " + producto.nombre + ".");
+      continue;
+    }
+
+    // Repetimos la solicitud hasta que se ingrese una cantidad válida.
+    while (true) {
+      const cantidadSeleccionada = prompt(
+        "Producto: " + producto.nombre + " ($" + producto.precio + ")\n" +
+        "Stock disponible: " + producto.stock + "\n" +
+        "Ingrese la cantidad que desea comprar:"
+      );
+
+      if (cantidadSeleccionada === null) break;
+
+      const cantidad = Number(cantidadSeleccionada);
+      if (agregarAlCarrito(producto, cantidad)) {
+        alert(
+          "Agregado al carrito:\n" + producto.nombre +
+          "\nCantidad: " + cantidad +
+          "\nStock restante: " + producto.stock
+        );
+        break;
+      }
+
+      alert("Ingrese una cantidad entera entre 1 y " + producto.stock + ".");
+    }
   }
 }
 
