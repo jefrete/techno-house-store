@@ -1,622 +1,565 @@
-// ENTREGA 5 - TECHNO HOUSE STORE
-// CLASE PRODUCTO
-// Producto es el molde para crear cada cámara.
+// ENTREGA 6 - TECHNO HOUSE STORE
+// La clase define qué datos tiene cada producto
 class Producto {
-    constructor(codigo, nombre, categoria, precio, stock) {
-        this.codigo = codigo;
-        this.nombre = nombre;
-        this.categoria = categoria;
-        this.precio = precio;
-        this.stock = stock;
+  constructor(codigo, nombre, categoria, precio, stock) {
+    this.codigo = codigo;
+    this.nombre = nombre;
+    this.categoria = categoria;
+    this.precio = precio;
+    this.stock = stock;
+  }
+
+  // Descuenta unidades si la cantidad es válida y hay stock.
+  vender(cantidad) {
+    // Solo aceptamos cantidades enteras positivas que no superen el stock.
+    if (!Number.isInteger(cantidad) || cantidad <= 0 || cantidad > this.stock) {
+      return false;
     }
-    // Descuenta unidades si la cantidad es válida y hay stock.
-    vender(cantidad) {
-        if (!Number.isInteger(cantidad) || cantidad <= 0 || cantidad > this.stock) {
-            return false;
-        }
-        this.stock -= cantidad;
-        return true;
+
+    // La venta es válida: actualizamos el stock y avisamos que tuvo éxito.
+    this.stock -= cantidad;
+    return true;
+  }
+
+  // Devuelve unidades al stock.
+  reponer(cantidad) {
+    // No se pueden reponer cantidades inválidas o menores que una unidad.
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+      return false;
     }
-    // Devuelve unidades al stock.
-    reponer(cantidad) {
-        if (!Number.isInteger(cantidad) || cantidad <= 0) {
-            return false;
-        }
-        this.stock += cantidad;
-        return true;
-    }
+
+    this.stock += cantidad;
+    return true;
+  }
 }
 
-// FUNCIÓN FLECHA: comprueba si un producto tiene stock.
-const tieneStock = producto => producto.stock > 0;
-// FUNCIÓN EXPRESADA: prepara un texto para hacer búsquedas.
-const normalizarTexto = function (texto) {
-    return texto.trim().toLowerCase();
-};
-
-// Catálogo completo de productos.
+// Cada elemento del catálogo es una instancia de Producto.
 const productos = [
-    new Producto("TH001", "Tapo C260 4K 8MP", "Interior", 180000, 5),
-    new Producto("TH002", "Tapo C245D Dual 2K + 2K", "Interior", 150000, 5),
-    new Producto("TH003", "Tapo C220 2K QHD", "Interior", 100000, 5),
-    new Producto("TH004", "Tapo C560WS 4K 8MP", "Exterior", 220000, 5),
-    new Producto("TH005", "Tapo C545D Dual 2K + 2K", "Exterior", 180000, 5),
-    new Producto("TH006", "Tapo C530WS 3K 5MP", "Exterior", 140000, 5),
-    new Producto("TH007", "EZVIZ H6c G1 4K 8MP", "Interior", 170000, 5),
-    new Producto("TH008", "EZVIZ H7c Dual 2K+", "Interior", 130000, 5),
-    new Producto("TH009", "EZVIZ H1c Full HD", "Interior", 80000, 5),
-    new Producto("TH010", "EZVIZ H8c Pro 4K", "Exterior", 200000, 5),
-    new Producto("TH011", "EZVIZ H9c Dual 3K", "Exterior", 240000, 5),
-    new Producto("TH012", "EZVIZ C8c 3K", "Exterior", 160000, 5)
+  new Producto("TH001", "Tapo C260 4K 8MP", "Interior", 180000, 5),
+  new Producto("TH002", "Tapo C245D Dual 2K + 2K", "Interior", 150000, 5),
+  new Producto("TH003", "Tapo C220 2K QHD", "Interior", 100000, 5),
+  new Producto("TH004", "Tapo C560WS 4K 8MP", "Exterior", 220000, 5),
+  new Producto("TH005", "Tapo C545D Dual 2K + 2K", "Exterior", 180000, 5),
+  new Producto("TH006", "Tapo C530WS 3K 5MP", "Exterior", 140000, 5),
+  new Producto("TH007", "EZVIZ H6c G1 4K 8MP", "Interior", 170000, 5),
+  new Producto("TH008", "EZVIZ H7c Dual 2K+", "Interior", 130000, 5),
+  new Producto("TH009", "EZVIZ H1c Full HD", "Interior", 80000, 5),
+  new Producto("TH010", "EZVIZ H8c Pro 4K", "Exterior", 200000, 5),
+  new Producto("TH011", "EZVIZ H9c Dual 3K", "Exterior", 240000, 5),
+  new Producto("TH012", "EZVIZ C8c 3K", "Exterior", 160000, 5)
 ];
 
-const destacados = [
-    productos[0],
-    productos[3],
-    productos[6],
-    productos[9]
-];
+// Guardamos algunos productos como destacados.
+const destacados = [productos[0], productos[3], productos[6], productos[9]];
 
 const carrito = [];
 
-// CARRITO-Agrega un producto al carrito y descuenta el stock.
+// LOGICA DE NEGOCIO
+
+// Agrega un producto al carrito
 function agregarAlCarrito(producto, cantidad) {
-    const ventaRealizada = producto.vender(cantidad);
-    // Si no se pudo realizar la venta, terminamos la función.
-    if (ventaRealizada === false) {
-        return false;
-    }
-    // Creamos un objeto para guardar la compra.
-    const nuevoItem = {
-        producto: producto,
-        cantidad: cantidad
-    };
-    // Agregamos ese objeto al carrito.
-    carrito.push(nuevoItem);
-    // Informamos que todo salió bien.
-    return true;
+  // vender() valida la cantidad y descuenta el stock.
+  if (!producto.vender(cantidad)) {
+    return false;
+  }
+  // find() busca si el producto ya tiene una entrada en el carrito.
+  const itemExistente = carrito.find(item => item.producto.codigo === producto.codigo);
+
+  if (itemExistente) {
+    // Si ya estaba, acumulamos las unidades
+    itemExistente.cantidad += cantidad;
+  } else {
+    // Si no estaba, creamos una nueva entrada en el carrito
+    carrito.push({ producto, cantidad });
+  }
+
+  return true;
 }
 
-// Quita el último ingreso del carrito y devuelve su stock.
+// Quita último ingreso y devuelve su stock.
 function quitarDelCarrito() {
-    if (carrito.length === 0) {
-        return null;
-    }
-    const item = carrito.pop();
-    item.producto.reponer(item.cantidad);
-    return item;
+  // validamos si el carrito está vacío.
+  if (carrito.length === 0) {
+    return null;
+  }
+
+  // quita el último elemento agregado.
+  const item = carrito.pop();
+  item.producto.reponer(item.cantidad);
+
+  return item;
 }
 
-// Calcula el importe total del carrito.
+// Suma el precio de los productos del carrito.
 function calcularTotal() {
-    let total = 0;
-    for (const item of carrito) {
-        total += item.producto.precio * item.cantidad;
-    }
-    return total;
+  // reduce() acumula los importes; 0 es el valor inicial del acumulador.
+  return carrito.reduce((total, item) => total + (item.producto.precio * item.cantidad), 0);
 }
 
-// Cuenta las unidades que hay en el carrito.
-function contarUnidades() {
-    let unidades = 0;
-    for (const item of carrito) {
-        unidades += item.cantidad;
-    }
-    return unidades;
-}
+// Suma las cantidades
+const contarUnidades = () => carrito.reduce((unidades, item) => unidades + item.cantidad, 0);
 
-// Guarda los datos de la compra y vacía el carrito.
+// guarda la compra confirmada y vacía el carrito.
 function confirmarCompra() {
-    if (carrito.length === 0) {
-        return null;
-    }
-    const compra = {
-        total: calcularTotal(),
-        unidades: contarUnidades()
-    };
-    // El stock queda descontado porque la compra fue confirmada.
-    carrito.length = 0;
-    return compra;
+  // valida si hay productos en el carrito
+  if (carrito.length === 0) {
+    return null;
+  }
+
+  // Guardamos los datos antes de vaciar el carrito.
+  const compra = {
+    total: calcularTotal(),
+    unidades: contarUnidades()
+  };
+
+  // El stock ya se descontó al agregar productos y queda vendido.
+  carrito.length = 0;
+  return compra;
 }
 
-// BÚSQUEDA DE PRODUCTOS
-function buscarPorNombre(nombre) {
-    const textoBuscado = normalizarTexto(nombre);
-    const resultados = [];
-    if (textoBuscado === "") {
-        return resultados;
-    }
-    for (const producto of productos) {
-        if (normalizarTexto(producto.nombre).includes(textoBuscado)) {
-            resultados.push(producto);
-        }
-    }
-    return resultados;
+// OPCION 4
+// Busca productos por código y luego por nombre
+function buscarProductos(texto) {
+  // normaliza
+  const buscado = texto.trim().toLowerCase();
+
+  // Primero intentamos encontrar un código completo.
+  const porCodigo = productos.find(producto => producto.codigo.trim().toLowerCase() === buscado);
+  if (porCodigo) return [porCodigo];
+
+  // Si no hubo código exacto, buscamos el texto dentro de los nombres.
+  return productos.filter(producto => producto.nombre.trim().toLowerCase().includes(buscado));
 }
 
-// MOSTRAR CARRITO
+// OPCION 2 y 3
+// Filtrar por categoría
+function filtrarPorCategoria(categoria) {
+  return productos.filter(producto => producto.categoria === categoria);
+}
+
 function mostrarCarrito() {
-    if (carrito.length === 0) {
-        return "CARRITO\nEl carrito está vacío.\nTOTAL: $0";
-    }
-    let texto = "CARRITO\n";
-    let numero = 1;
-    for (const item of carrito) {
-        texto += numero + ". " + item.producto.nombre +
-            " - Cantidad: " + item.cantidad +
-            " - Subtotal: $" + (item.producto.precio * item.cantidad) + "\n";
-        numero++;
-    }
-    return texto + "TOTAL: $" + calcularTotal();
+  if (carrito.length === 0) {
+    return "CARRITO\nEl carrito está vacío.\nTOTAL: $0";
+  }
+
+  let texto = "CARRITO\n";
+
+  // Recorremos las entradas para mostrar cantidad e importe por producto.
+  carrito.forEach((item, indice) => {
+    const subtotal = item.producto.precio * item.cantidad;
+    texto += (indice + 1) + ". " + item.producto.nombre +
+      " - Cant: " + item.cantidad + " - Subtotal: $" +
+      subtotal + "\n";
+  });
+
+  // Al final mostramos el total general, calculado por calcularTotal().
+  return texto + "TOTAL: $" + calcularTotal();
 }
 
-// COMPRAR PRODUCTOS: Recibe un producto, pide la cantidad y lo agrega al carrito.
-function comprarProducto(producto) {
-    if (producto.stock <= 0) {
-        alert("No hay stock disponible de " + producto.nombre + ".");
-        return;
+// Permite elegir y comprar un producto de la lista recibida.
+function comprarProducto(lista) {
+  // Evitamos pedir una opción si la lista no contiene productos.
+  if (lista.length === 0) {
+    alert("No hay productos para mostrar.");
+    return;
+  }
+
+  // Armamos el listado numerado en el momento de mostrarlo.
+  let textoLista = "PRODUCTOS DISPONIBLES\n";
+  lista.forEach((producto, indice) => {
+    textoLista += (indice + 1) + ". " + producto.codigo + " - " +
+      producto.nombre + " (" + producto.categoria + ") - $" +
+      producto.precio + " - Stock: " + producto.stock + "\n";
+  });
+
+  // Presentamos la lista y esperamos el número elegido por el usuario.
+  const productoSeleccionado = prompt(
+    textoLista +
+    "\n\nIngrese el número del producto deseado:\n0. Volver"
+  );
+
+  // validamos cancelar, dejar vacio
+  if (!productoSeleccionado || productoSeleccionado.trim() === "0") return;
+
+  // Convertimos el texto del prompt en número
+  const numeroElegido = Number(productoSeleccionado);
+
+  //validamos indice
+  if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > lista.length) {
+    alert("Seleccione un número válido.");
+    return;
+  }
+
+  // Las opciones empiezan en 1, pero el array empieza en 0
+  const producto = lista[numeroElegido - 1];
+
+  // validamos stock
+  if (!(producto.stock > 0)) {
+    alert("No hay stock disponible de " + producto.nombre + ".");
+    return;
+  }
+
+  // Repetimos la solicitud hasta que se ingrese una cantidad válida
+  while (true) {
+    const cantidadSeleccionada = prompt(
+      "Producto: " + producto.nombre + " ($" + producto.precio + ")\n" +
+      "Stock disponible: " + producto.stock + "\n" +
+      "Ingrese la cantidad que desea comprar:"
+    );
+
+    // validamos cancelar
+    if (cantidadSeleccionada === null) return;
+
+    const cantidad = Number(cantidadSeleccionada);
+    // agregarAlCarrito valida la cantidad, descuenta stock y actualiza el carrito.
+    //si devuelve true mostramos mensaje
+    if (agregarAlCarrito(producto, cantidad)) {
+      alert(
+        "Agregado al carrito:\n" + cantidad + "x " +
+        producto.nombre + "\nStock restante: " + producto.stock
+      );
+      return;
     }
-    let cantidad;
-    let cantidadValida = false;
-    // Repetimos el pedido mientras la cantidad no sea válida.
-    while (cantidadValida === false) {
-        // Pedimos al usuario cuántas unidades quiere comprar.
-        const entrada = prompt(
-            "Producto: " + producto.nombre + "\n" +
-            "Stock disponible: " + producto.stock + "\n" +
-            "Ingrese la cantidad que desea comprar:"
-        );
-        // Si cancela, terminamos la función.
-        if (entrada === null) {
-            return;
-        }
-        // Convertimos el texto ingresado a número.
-        cantidad = Number(entrada);
-        // Comprobamos que sea un entero entre 1 y el stock disponible.
-        if (
-            Number.isInteger(cantidad) &&
-            cantidad >= 1 &&
-            cantidad <= producto.stock
-        ) {
-            cantidadValida = true;
-        } else {
-            alert("Ingrese una cantidad entera entre 1 y " + producto.stock + ".");
-        }
-    }
-    // Intentamos agregar el producto al carrito.
-    const agregado = agregarAlCarrito(producto, cantidad);
-    // Si se agregó correctamente, mostramos los datos de la compra.
-    if (agregado === true) {
-        alert(
-            "Producto agregado al carrito.\n" +
-            producto.nombre + "\n" +
-            "Unidades: " + cantidad + "\n" +
-            "Stock restante: " + producto.stock
-        );
-    }
+
+    // si devuelve false informamos el rango permitido y volvemos a pedir ingreso
+    alert("Ingrese una cantidad entera entre 1 y " + producto.stock + ".");
+  }
 }
 
-// Opción 1: muestra el catálogo y permite comprar.
-function verCatalogoYComprar() {
-    let texto = "CATÁLOGO DE PRODUCTOS\n";
-    let numero = 1;
-    // Armamos directamente la lista del catálogo.
-    for (const producto of productos) {
-        texto += numero + ". " + producto.codigo + " - " +
-            producto.nombre + " - " + producto.categoria +
-            " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-        numero++;
-    }
-    // Mostramos la lista y pedimos el número del producto.
-    const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
-    if (entrada === null || entrada.trim() === "") {
-        return;
-    }
-    const numeroElegido = Number(entrada);
-    if (numeroElegido === 0) {
-        return;
-    }
-    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > productos.length) {
-        alert("Seleccione un número válido del catálogo.");
-        return;
-    }
-    comprarProducto(productos[numeroElegido - 1]);
-}
-
-// Opción 2: busca por nombre y permite comprar.
-function buscarYComprar() {
-    const nombre = prompt("Ingrese el nombre o característica que desea buscar:");
-    // Si se cancela el prompt o solo se ingresan espacios, no hay nada que buscar.
-    if (nombre === null || normalizarTexto(nombre) === "") {
-        return;
-    }
-    // La función de búsqueda devuelve un arreglo con los productos coincidentes.
-    const resultados = buscarPorNombre(nombre);
-    // Avisamos y terminamos si la búsqueda no encontró coincidencias.
-    if (resultados.length === 0) {
-        alert("No se encontraron productos.");
-        return;
-    }
-    // Preparamos el texto que mostrará los resultados numerados.
-    let texto = "RESULTADOS DE LA BÚSQUEDA\n";
-    let numero = 1;
-    // Agregamos los datos de cada producto y aumentamos su número en la lista.
-    for (const producto of resultados) {
-        texto += numero + ". " + producto.codigo + " - " +
-            producto.nombre + " - " + producto.categoria +
-            " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-        numero++;
-    }
-    // Mostramos los resultados y pedimos el número del producto que se quiere comprar.
-    const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
-    // Si se cancela o se deja vacío el prompt, volvemos al menú anterior.
-    if (entrada === null || entrada.trim() === "") {
-        return;
-    }
-    // prompt devuelve texto; lo convertimos a número para validar la opción elegida.
-    const numeroElegido = Number(entrada);
-    // La opción 0 permite volver sin seleccionar un producto.
-    if (numeroElegido === 0) {
-        return;
-    }
-    // Rechazamos valores que no sean enteros o que estén fuera de la lista mostrada.
-    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > resultados.length) {
-        alert("Seleccione un número válido de los resultados.");
-        return;
-    }
-    // La lista visible empieza en 1, pero los arreglos usan índices desde 0.
-    // Restamos 1 para obtener el producto elegido y pasarlo al flujo de compra.
-    comprarProducto(resultados[numeroElegido - 1]);
-}
-
-// Opción 4: muestra los destacados y permite comprar.
-function verDestacadosYComprar() {
-    if (destacados.length === 0) {
-        alert("No hay productos destacados.");
-        return;
-    }
-    let texto = "PRODUCTOS DESTACADOS\n";
-    let numero = 1;
-    // Armamos directamente la lista de productos destacados.
-    for (const producto of destacados) {
-        texto += numero + ". " + producto.codigo + " - " +
-            producto.nombre + " - " + producto.categoria +
-            " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-        numero++;
-    }
-    const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
-    if (entrada === null || entrada.trim() === "") {
-        return;
-    }
-    const numeroElegido = Number(entrada);
-    if (numeroElegido === 0) {
-        return;
-    }
-    if (!Number.isInteger(numeroElegido) || numeroElegido < 1 || numeroElegido > destacados.length) {
-        alert("Seleccione un número válido de destacados.");
-        return;
-    }
-    comprarProducto(destacados[numeroElegido - 1]);
-}
-// Opcion 3: muestra el carrito y permite finalizar la compra o quitar productos.
+// OPCION 5 - ver carrito
 function verCarrito() {
-    let opcion;
-    while (opcion !== "0" && opcion !== null) {
-        opcion = prompt(
-            mostrarCarrito() + "\n\n" +
-            "1. Finalizar compra\n" +
-            "2. Quitar el último producto\n" +
-            "0. Volver"
-        );
-        if (opcion === "1") {
-            if (carrito.length === 0) {
-                alert("El carrito está vacío.");
-            } else if (confirm(mostrarCarrito() + "\n¿Desea confirmar la compra?")) {
-                const compra = confirmarCompra();
-                alert(
-                    "Compra confirmada.\n" +
-                    "Unidades: " + compra.unidades + "\n" +
-                    "Total: $" + compra.total
-                );
-                // Terminamos verCarrito() para que no vuelva a aparecer el menú vacío.
-                return;
-            }
-        } else if (opcion === "2") {
-            if (carrito.length === 0) {
-                alert("El carrito está vacío.");
-            } else {
-                const item = quitarDelCarrito();
-                alert("Se quitó " + item.producto.nombre + " y se devolvió al stock.");
-            }
-        } else if (opcion !== "0" && opcion !== null) {
-            alert("Seleccione una opción válida.");
+  let opcion;
+
+  // El menú sigue apareciendo hasta elegir volver o cancelar.
+  while (opcion !== "0" && opcion !== null) {
+    opcion = prompt(
+      mostrarCarrito() + "\n\n" +
+      "1. Finalizar compra\n" +
+      "2. Quitar el último producto\n" +
+      "0. Volver"
+    );
+
+    // switch dirige el flujo según la opción elegida.
+    switch (opcion) {
+      case "1": {
+        if (carrito.length === 0) {
+          alert("El carrito está vacío.");
+        } else if (confirm(mostrarCarrito() + "\n\n¿Desea confirmar la compra?")) {
+          // confirmarCompra() guarda el total y vacía el carrito.
+          const compra = confirmarCompra();
+          alert(
+            "Compra confirmada.\nUnidades: " + compra.unidades +
+            "\nTotal: $" + compra.total
+          );
+          return;
         }
+        break;
+      }
+
+      case "2": {
+        // quitarDelCarrito() también repone el stock del producto quitado.
+        const item = quitarDelCarrito();
+        if (!item) {
+          alert("El carrito está vacío.");
+        } else {
+          alert("Se quitó " + item.producto.nombre + " y se devolvió al stock.");
+        }
+        break;
+      }
+
+      case "0":
+      case null:
+        break;
+
+      default:
+        // Las opciones distintas de 0, 1, 2 o cancelar no son válidas.
+        alert("Seleccione una opción válida.");
     }
+  }
 }
-// Opción 5: permite administrar los productos destacados. 
+
+// OPCION 7
 function administrarDestacados() {
-    let opcion;
-    // El menú se repite hasta elegir "0" o cancelar el prompt.
-    while (opcion !== "0" && opcion !== null) {
-        opcion = prompt(
-            "ADMINISTRAR DESTACADOS\n" +
-            "1. Agregar producto\n" +
-            "2. Fijar producto al comienzo\n" +
-            "3. Quitar el último producto\n" +
-            "4. Reemplazar un producto por posición\n" +
-            "5. Ver destacados\n" +
-            "0. Volver"
+  let opcion;
+
+  // El menú se repite hasta volver o cancelar.
+  while (opcion !== "0" && opcion !== null) {
+    opcion = prompt(
+      "ADMINISTRAR DESTACADOS\n" +
+      "1. Agregar producto\n" +
+      "2. Fijar producto al comienzo\n" +
+      "3. Quitar el último producto\n" +
+      "4. Reemplazar un producto por posición\n" +
+      "5. Ver destacados\n" +
+      "0. Volver"
+    );
+
+    switch (opcion) {
+      case "1": {
+        // elegir un producto del catálogo para agregarlo a destacados.
+        let textoCatalogo = "CATÁLOGO\n";
+        productos.forEach((producto, indice) => {
+          textoCatalogo += (indice + 1) + ". " + producto.codigo + " - " +
+            producto.nombre + " (" + producto.categoria + ") - $" +
+            producto.precio + " - Stock: " + producto.stock + "\n";
+        });
+
+        const entrada = prompt(
+          textoCatalogo +
+          "\n\nIngrese el número del producto:\n0. Volver"
         );
-        // Según la opción elegida, ejecutamos una acción distinta sobre destacados.
-        switch (opcion) {
-            //agregar un producto al final de destacados.
-            case "1": {
-                let texto = "CATÁLOGO DE PRODUCTOS\n";
-                let numero = 1;
-                // Recorremos el catálogo para armar el listado.
-                for (const producto of productos) {
-                    texto += numero + ". " + producto.codigo + " - " +
-                        producto.nombre + " - " + producto.categoria +
-                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                    numero++;
-                }
-                // Pedimos qué producto queremos agregar.
-                const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
-                // Si cancela o deja vacío, volvemos al menú.
-                if (entrada === null || entrada.trim() === "") {
-                    break;
-                }
-                const numeroElegido = Number(entrada);
-                // El 0 permite volver al menú.
-                if (numeroElegido === 0) {
-                    break;
-                }
-                // Validamos que el número corresponda a un producto.
-                if (!Number.isInteger(numeroElegido) ||
-                    numeroElegido < 1 ||
-                    numeroElegido > productos.length) {
-                    alert("Seleccione un número válido.");
-                    break;
-                }
-                // Obtenemos el producto elegido.
-                const producto = productos[numeroElegido - 1];
-                // Comprobamos si ya está en destacados.
-                if (destacados.includes(producto)) {
-                    alert("Ese producto ya está en destacados.");
-                } else {
-                    // Agregamos el producto al final del array.
-                    destacados.push(producto);
-                    alert(producto.nombre + " se agregó a destacados.");
-                }
-                break;
-            }
-            // Fijar un producto al comienzo de destacados.
-            case "2": {
-                let texto = "CATÁLOGO DE PRODUCTOS\n";
-                let numero = 1;
-                // Recorremos el catálogo para armar el listado.
-                for (const producto of productos) {
-                    texto += numero + ". " + producto.codigo + " - " +
-                        producto.nombre + " - " + producto.categoria +
-                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                    numero++;
-                }
-                // Pedimos qué producto queremos colocar al comienzo.
-                const entrada = prompt(texto + "\nIngrese el número del producto:\n0. Volver");
-                // Si cancela o deja vacío, volvemos al menú.
-                if (entrada === null || entrada.trim() === "") {
-                    break;
-                }
-                const numeroElegido = Number(entrada);
-                // El 0 permite volver al menú.
-                if (numeroElegido === 0) {
-                    break;
-                }
-                // Validamos que el número corresponda a un producto.
-                if (!Number.isInteger(numeroElegido) ||
-                    numeroElegido < 1 ||
-                    numeroElegido > productos.length) {
-                    alert("Seleccione un número válido.");
-                    break;
-                }
-                // Obtenemos el producto elegido.
-                const producto = productos[numeroElegido - 1];
-                // Buscamos si el producto ya está en destacados.
-                const posicionActual = destacados.indexOf(producto);
-                // Si ya existe, lo quitamos de su posición anterior.
-                if (posicionActual !== -1) {
-                    destacados.splice(posicionActual, 1);
-                }
-                // Colocamos el producto al comienzo.
-                destacados.unshift(producto);
-                alert(producto.nombre + " quedó primero en destacados.");
-                break;
-            }
-            // Quitar el último producto de destacados.
-            case "3": {
-                // Quitamos el último producto del array.
-                const quitado = destacados.pop();
-                // Comprobamos si pop() encontró un producto.
-                if (quitado !== undefined) {
-                    alert(quitado.nombre + " se quitó de destacados.");
-                } else {
-                    alert("No hay productos destacados para quitar.");
-                }
-                break;
-            }
-            // REEMPLAZAR UN PRODUCTO POR POSICIÓN
-            case "4": {
-                if (destacados.length === 0) {
-                    alert("No hay destacados para reemplazar.");
-                    continue;
-                }
-                let textoDestacados = "PRODUCTOS DESTACADOS\n";
-                let numero = 1;
-                // Mostramos los destacados numerados para elegir cuál será reemplazado.
-                for (const producto of destacados) {
-                    textoDestacados += numero + ". " + producto.codigo + " - " +
-                        producto.nombre + " - " + producto.categoria +
-                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                    numero++;
-                }
-                // Pedimos la posición actual del destacado que se quiere cambiar.
-                const entradaPosicion = prompt(
-                    textoDestacados + "\n¿Qué número desea reemplazar?\n0. Volver"
-                );
-                // Cancelar o dejar vacío vuelve al menú sin hacer cambios.
-                if (entradaPosicion === null || entradaPosicion.trim() === "") {
-                    continue;
-                }
-                // Convertimos la posición ingresada para validarla y usarla como índice.
-                const posicion = Number(entradaPosicion);
-                // El 0 cancela la operación y regresa al menú de administración.
-                if (posicion === 0) {
-                    continue;
-                }
-                // La posición debe ser un entero dentro de los destacados actuales.
-                if (!Number.isInteger(posicion) ||
-                    posicion < 1 ||
-                    posicion > destacados.length) {
-                    alert("Seleccione una posición válida.");
-                    continue;
-                }
-                // Mostramos el catálogo completo para elegir el producto que ocupará esa posición.
-                let textoCatalogo = "CATÁLOGO DE PRODUCTOS\n";
-                numero = 1;
-                for (const producto of productos) {
-                    textoCatalogo += numero + ". " + producto.codigo + " - " +
-                        producto.nombre + " - " + producto.categoria +
-                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                    numero++;
-                }
-                // Pedimos el producto nuevo; 0 permite cancelar el reemplazo.
-                const entradaProducto = prompt(
-                    textoCatalogo + "\nIngrese el número del producto nuevo:\n0. Volver"
-                );
-                // Cancelar o dejar vacío no cambia la lista de destacados.
-                if (entradaProducto === null || entradaProducto.trim() === "") {
-                    continue;
-                }
-                // Convertimos el número elegido para validar que corresponda al catálogo.
-                const numeroProducto = Number(entradaProducto);
-                // Si se ingresa 0, no se realiza el reemplazo.
-                if (numeroProducto === 0) {
-                    continue;
-                }
-                // Rechazamos valores no enteros o fuera de las opciones del catálogo.
-                if (!Number.isInteger(numeroProducto) ||
-                    numeroProducto < 1 ||
-                    numeroProducto > productos.length) {
-                    alert("Seleccione un producto válido.");
-                    continue;
-                }
-                // Convertimos el número visible (que empieza en 1) a índice (que empieza en 0).
-                const productoNuevo = productos[numeroProducto - 1];
-                // Comprobamos si el producto ya ocupa una posición en destacados.
-                const posicionExistente = destacados.indexOf(productoNuevo);
-                // Se permite elegir el mismo producto que ya ocupa la posición a reemplazar,
-                // pero no duplicar uno que esté en otra posición.
-                if (posicionExistente !== -1 && posicionExistente !== posicion - 1) {
-                    alert("Ese producto ya está en otra posición de destacados.");
-                    continue;
-                }
-                // splice reemplaza un elemento: índice, cantidad a quitar, elemento nuevo.
-                destacados.splice(posicion - 1, 1, productoNuevo);
-                alert("Se reemplazó el producto de la posición " + posicion + ".");
-                // Salimos del switch; el menú vuelve a mostrarse en la siguiente vuelta.
-                break;
-            }
-            // ver destacados
-            case "5": {
-                let texto = "PRODUCTOS DESTACADOS\n";
-                let numero = 1;
-                // Preparamos un listado numerado con los datos actuales de cada destacado.
-                for (const producto of destacados) {
-                    texto += numero + ". " + producto.codigo + " - " +
-                        producto.nombre + " - " + producto.categoria +
-                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                    numero++;
-                }
-                alert(texto);
-                // Salimos del switch; el menú vuelve a mostrarse en la siguiente vuelta.
-                break;
-            }
-            // VOLVER O CANCELAR
-            case "0":
-            case null:
-                // finaliza el menú.
-                break;
-            default:
-                alert("Seleccione una opción válida.");
+        // Cancelar o elegir 0 vuelve al menú de destacados.
+        if (!entrada || entrada.trim() === "0") break;
+
+        // Validamos
+        const productoSeleccionado = Number(entrada);
+
+        if (!Number.isInteger(productoSeleccionado) || productoSeleccionado < 1 || productoSeleccionado > productos.length) {
+          alert("Seleccione un número válido.");
+          break;
         }
+
+        // Convertimos la opción visible al índice correspondiente del array
+        const producto = productos[productoSeleccionado - 1];
+
+        // some() comprueba si ya existe un producto con ese código.
+        if (destacados.some(destacado => destacado.codigo === producto.codigo)) {
+          alert("Ese producto ya está en destacados.");
+        } else {
+          destacados.push(producto);
+          alert(producto.nombre + " se agregó a destacados.");
+        }
+        break;
+      }
+
+      case "2": {
+        // elegir un producto para colocarlo al principio
+        let textoCatalogo = "CATÁLOGO\n";
+        productos.forEach((producto, indice) => {
+          textoCatalogo += (indice + 1) + ". " + producto.codigo + " - " +
+            producto.nombre + " (" + producto.categoria + ") - $" +
+            producto.precio + " - Stock: " + producto.stock + "\n";
+        });
+
+        const entrada = prompt(
+          textoCatalogo +
+          "\n\nIngrese el número del producto:\n0. Volver"
+        );
+        if (!entrada || entrada.trim() === "0") break;
+
+        const productoSeleccionado = Number(entrada);
+        //validamos
+        if (!Number.isInteger(productoSeleccionado) || productoSeleccionado < 1 || productoSeleccionado > productos.length) {
+          alert("Seleccione un número válido.");
+          break;
+        }
+
+        const producto = productos[productoSeleccionado - 1];
+        // Si ya estaba destacado, lo quitamos de su ubicación anterior.
+        const posActual = destacados.indexOf(producto);
+        if (posActual !== -1) {
+          destacados.splice(posActual, 1);
+        }
+
+        // unshift() lo coloca en la primera posición del array.
+        destacados.unshift(producto);
+        alert(producto.nombre + " quedó primero en destacados.");
+        break;
+      }
+
+      case "3": {
+        // quita el último destacado y lo devuelve.
+        const quitado = destacados.pop();
+        if (quitado) {
+          alert(quitado.nombre + " se quitó de destacados.");
+        } else {
+          alert("No hay destacados para quitar.");
+        }
+        break;
+      }
+
+      case "4": {
+        // reemplazar un destacado por otro producto del catálogo.
+        if (destacados.length === 0) {
+          alert("No hay destacados para reemplazar.");
+          break;
+        }
+
+        // solicitamos qué posición reemplazar
+        let textoDestacados = "DESTACADOS\n";
+        destacados.forEach((producto, indice) => {
+          textoDestacados += (indice + 1) + ". " + producto.codigo + " - " +
+            producto.nombre + " (" + producto.categoria + ") - $" +
+            producto.precio + " - Stock: " + producto.stock + "\n";
+        });
+
+        const posicion = prompt(
+          textoDestacados +
+          "\n\n¿Qué número desea reemplazar?\n0. Volver"
+        );
+
+        if (!posicion || posicion.trim() === "0") break;
+
+        // Validamos que la posición elegida exista en destacados.
+        const pos = Number(posicion);
+        if (!Number.isInteger(pos) || pos < 1 || pos > destacados.length) {
+          alert("Seleccione una posición válida.");
+          break;
+        }
+
+        // pedimos el producto nuevo desde el catálogo
+        let textoCatalogo = "CATÁLOGO\n";
+        productos.forEach((producto, indice) => {
+          textoCatalogo += (indice + 1) + ". " + producto.codigo + " - " +
+            producto.nombre + " (" + producto.categoria + ") - $" +
+            producto.precio + " - Stock: " + producto.stock + "\n";
+        });
+
+        const entradaProducto = prompt(
+          textoCatalogo +
+          "\n\nIngrese el número del producto nuevo:\n0. Volver"
+        );
+
+        if (!entradaProducto || entradaProducto.trim() === "0") break;
+
+        // Validamos el número del producto nuevo.
+        const numProd = Number(entradaProducto);
+
+        if (!Number.isInteger(numProd) || numProd < 1 || numProd > productos.length) {
+          alert("Seleccione un producto válido.");
+          break;
+        }
+
+        // Evitamos duplicados, pero permitimos dejar el producto en su misma posición.
+        const productoNuevo = productos[numProd - 1];
+        const posExistente = destacados.indexOf(productoNuevo);
+        if (posExistente !== -1 && posExistente !== pos - 1) {
+          alert("Ese producto ya está en otra posición de destacados.");
+          break;
+        }
+
+        // splice() reemplaza un elemento a partir del índice indicado.
+        destacados.splice(pos - 1, 1, productoNuevo);
+        alert("Se reemplazó el producto de la posición " + pos + ".");
+        break;
+      }
+
+      case "5":
+        // mostrar destacados
+        if (destacados.length > 0) {
+          let textoDestacados = "PRODUCTOS DESTACADOS\n";
+          destacados.forEach((producto, indice) => {
+            textoDestacados += (indice + 1) + ". " + producto.codigo + " - " +
+              producto.nombre + " (" + producto.categoria + ") - $" +
+              producto.precio + " - Stock: " + producto.stock + "\n";
+          });
+          alert(textoDestacados);
+        } else {
+          alert("No hay destacados.");
+        }
+        break;
+
+      case "0":
+      case null:
+        break;
+
+      default:
+        alert("Seleccione una opción válida.");
     }
+  }
 }
+
 // MENÚ PRINCIPAL
 function iniciarTienda() {
-    const nombre = prompt("Bienvenido a TECHNO HOUSE STORE.\nIngrese su nombre:");
-    let opcion = "";
-    while (opcion !== "0" && opcion !== null) {
-        opcion = prompt(
-            "TECHNO HOUSE STORE\n" +
-            "Hola, " + nombre + ".\n" +
-            "1. Ver catálogo completo\n" +
-            "2. Buscar producto por nombre\n" +
-            "3. Ver carrito\n" +
-            "4. Ver productos destacados\n" +
-            "5. Administrar destacados\n" +
-            "6. Imprimir catálogo en la consola\n" +
-            "0. Salir"
-        );
-        switch (opcion) {
-            case "1":
-                verCatalogoYComprar();
-                break;
-            case "2":
-                buscarYComprar();
-                break;
-            case "3":
-                verCarrito();
-                break;
-            case "4":
-                verDestacadosYComprar();
-                break;
-            case "5":
-                administrarDestacados();
-                break;
-            case "6": {
-                let texto = "CATÁLOGO DE PRODUCTOS\n";
-                let numero = 1;
-                // Armamos el catálogo directamente para mostrarlo en consola.
-                for (const producto of productos) {
-                    texto += numero + ". " + producto.codigo + " - " +
-                        producto.nombre + " - " + producto.categoria +
-                        " - $" + producto.precio + " - Stock: " + producto.stock + "\n";
-                    numero++;
-                }
-                console.log(texto);
-                break;
-            }
-            case "0":
-            case null:
-                break;
-            default:
-                alert("Seleccione una opción válida.");
+  const nombre = prompt("Bienvenido a TECHNO HOUSE STORE.\nIngrese su nombre:");
+  let opcion = "";
+
+  // Repetimos el menú principal hasta que el usuario salga o cancele.
+  while (opcion !== "0" && opcion !== null) {
+    opcion = prompt(
+      "TECHNO HOUSE STORE - Hola, " + nombre + ".\n\n" +
+      "1. Ver catálogo completo\n" +
+      "2. Ver cámaras de interior\n" +
+      "3. Ver cámaras de exterior\n" +
+      "4. Buscar producto por nombre o código\n" +
+      "5. Ver carrito\n" +
+      "6. Ver productos destacados\n" +
+      "7. Administrar destacados\n" +
+      "8. Imprimir catálogo en la consola\n" +
+      "0. Salir"
+    );
+
+    switch (opcion) {
+      case "1":
+        // Comprar desde el catalogo completo
+        comprarProducto(productos);
+        break;
+
+      case "2":
+        // Filtrar catalogo por categoria
+        comprarProducto(filtrarPorCategoria("Interior"));
+        break;
+
+      case "3":
+        comprarProducto(filtrarPorCategoria("Exterior"));
+        break;
+
+      case "4": {
+        // Buscar coincidencias por código o nombre.
+        const texto = prompt("Ingrese el nombre o código del producto:");
+
+        if (texto && texto.trim() !== "") {
+          const resultados = buscarProductos(texto);
+          comprarProducto(resultados);
         }
+        break;
+      }
+
+      case "5":
+        verCarrito();
+        break;
+
+      case "6":
+        comprarProducto(destacados);
+        break;
+
+      case "7":
+        // agregar, quitar o reemplazar destacados
+        administrarDestacados();
+        break;
+      case "8":
+        // Mostrar catalogo en la consola
+        let textoCatalogo = "CATÁLOGO DE PRODUCTOS\n";
+        productos.forEach((producto, indice) => {
+          textoCatalogo += (indice + 1) + ". " + producto.codigo + " - " +
+            producto.nombre + " (" + producto.categoria + ") - $" +
+            producto.precio + " - Stock: " + producto.stock + "\n";
+        });
+        console.log(textoCatalogo);
+        break;
+      case "0":
+      case null:
+        // El ciclo terminará al comprobar esta opción.
+        break;
+      default:
+        // Informar cualquier opción que no esté contemplada en el menú.
+        alert("Seleccione una opción válida.");
     }
-    alert("Gracias por visitar TECHNO HOUSE STORE, " + nombre + ".");
+  }
+
+  // Mensaje de despedida al salir del menú principal.
+  alert("Gracias por visitar TECHNO HOUSE STORE, " + nombre + ".");
 }
-// TEST EN CONSOLA
-// quita y suma stock de un producto para comprobar que vender() y reponer() funcionan correctamente.
+
+// PRUEBA EN CONSOLA
+// Vendemos y reponemos la misma cantidad para comprobar los métodos sin cambiar el stock final.
 console.log("TEST: probando vender() y reponer().");
 const productoPrueba = productos[0];
-console.log("Producto:", productoPrueba.nombre);
-console.log("Stock inicial:", productoPrueba.stock);
-console.log("¿Tiene stock?:", tieneStock(productoPrueba));
-// Vendemos 2 unidades.
+console.log("Producto:", productoPrueba.nombre, "| Stock inicial:", productoPrueba.stock, "| ¿Tiene stock?:", productoPrueba.stock > 0);
 productoPrueba.vender(2);
 console.log("Stock después de vender 2:", productoPrueba.stock);
-// Reponemos las mismas 2 unidades.
 productoPrueba.reponer(2);
 console.log("Stock después de reponer 2:", productoPrueba.stock);
-//iniciar simulador de tienda.
+
+// Inicia la interacción con el usuario.
 iniciarTienda();
